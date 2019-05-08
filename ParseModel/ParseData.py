@@ -63,7 +63,51 @@ def produce(buf, remain):
             current = 0
         remain = data[current:]
         return remain
-    elif conf.get_protocol_type() == 3 or conf.get_protocol_type() == 5:
+    elif conf.get_protocol_type() == 3:
+        data = remain + buf
+        st_list = [m.start() for m in re.finditer(b"\x7e", data)]
+        current = -1
+        for x in range(len(st_list)):
+            if st_list[x] <= current:
+                continue
+            if not st_list[x] == st_list[-1]:
+                if st_list[x]+1 == st_list[x+1]:
+                    logger.info(data[st_list[x]:st_list[x]+2])
+                    continue
+            for y in range(x + 1, len(st_list)):
+                data_piece = data[st_list[x]:st_list[y] + 1]
+                if len(data_piece) > 2 and b'\x7e' not in data_piece[1:-1]:
+                    data_piece = rec_translate(data_piece)
+                    # if byte2str(data_piece[-2:-1]) == calc_check_code(byte2str(data_piece[1:-2])):
+                    rec_queue.put(data_piece)
+                    current = st_list[y]
+                    break
+                else:
+                    logger.error("未能解析的7E数据" + byte2str(data_piece))
+        remain = data[current + 1:]
+        return remain
+    elif conf.get_protocol_type() == 4:
+        data = remain + buf
+        st_list = [m.start() for m in re.finditer(b"\x55", data)]
+        current = -1
+        for x in range(len(st_list)):
+            if st_list[x] <= current:
+                continue
+            if not st_list[x] == st_list[-1]:
+                if st_list[x]+1 == st_list[x+1]:
+                    logger.info(data[st_list[x]:st_list[x]+2])
+                    continue
+            for y in range(x + 1, len(st_list)):
+                data_piece = rec_translate(data[st_list[x]:st_list[y] + 1])
+                if len(data_piece) > 2:
+                    rec_queue.put(data_piece)
+                    current = st_list[y]
+                    break
+                else:
+                    logger.error("未能解析的55数据" + byte2str(data_piece))
+        remain = data[current + 1:]
+        return remain
+    elif conf.get_protocol_type() == 5:
         data = remain + buf
         if data[0:1] == b'\x7e':
             st_list = [m.start() for m in re.finditer(b"\x7e", data)]
@@ -99,27 +143,6 @@ def produce(buf, remain):
                 logger.error(byte2str(data))
             else:
                 remain = data
-        return remain
-    elif conf.get_protocol_type() == 4:
-        data = remain + buf
-        st_list = [m.start() for m in re.finditer(b"\x55", data)]
-        current = -1
-        for x in range(len(st_list)):
-            if st_list[x] <= current:
-                continue
-            if not st_list[x] == st_list[-1]:
-                if st_list[x]+1 == st_list[x+1]:
-                    logger.info(data[st_list[x]:st_list[x]+2])
-                    continue
-            for y in range(x + 1, len(st_list)):
-                data_piece = rec_translate(data[st_list[x]:st_list[y] + 1])
-                if len(data_piece) > 2:
-                    rec_queue.put(data_piece)
-                    current = st_list[y]
-                    break
-                else:
-                    logger.error("未能解析的55数据" + byte2str(data_piece))
-        remain = data[current + 1:]
         return remain
 
 
