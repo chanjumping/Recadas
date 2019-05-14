@@ -104,8 +104,13 @@ def reboot():
 def send_tts():
     if conf.get_protocol_type() == 3:
         tts_ = e_tts.get()
+        tts_flag_ = e_tts_flag.get()
         if tts_:
-            msg_body = '08' + byte2str(tts_.encode('gbk'))
+            if tts_flag_:
+                tts_flag_ = num2big(int(tts_flag_), 1)
+            else:
+                tts_flag_ = '08'
+            msg_body = tts_flag_ + byte2str(tts_.encode('gbk'))
             body = '8300' + num2big(int(len(msg_body) / 2)) + GlobalVar.DEVICEID + \
                    num2big(GlobalVar.get_serial_no()) + msg_body
             data = '7E' + body + calc_check_code(body) + '7E'
@@ -251,10 +256,11 @@ product.grid(row=0, column=3, sticky=W)
 e_product = Entry(root)
 e_product.grid(row=0, column=4, sticky=E)
 
-if conf.get_protocol_type() == 3 or conf.get_protocol_type() == 5:
-    port = Label(root, text='端口号：')
-elif conf.get_protocol_type() == 4:
+
+if conf.get_protocol_type() == 4:
     port = Label(root, text='文件地址：')
+else:
+    port = Label(root, text='端口号：')
 port.grid(row=1, sticky=W)
 e_port = Entry(root)
 e_port.grid(row=1, column=1, sticky=E)
@@ -282,14 +288,19 @@ e_mode.grid(row=5, column=1, sticky=E)
 set_para_button = Button(root, text='下发终端参数', command=set_para)
 set_para_button.grid(row=6, sticky=W)
 
+tts_flag = Label(root, text='TTS标志：')
+tts_flag.grid(row=1, column=3, sticky=W)
+e_tts_flag = Entry(root)
+e_tts_flag.grid(row=1, column=4, sticky=E)
+
 
 tts = Label(root, text='TTS语音内容：')
-tts.grid(row=1, column=3, sticky=W)
+tts.grid(row=2, column=3, sticky=W)
 e_tts = Entry(root)
-e_tts.grid(row=1, column=4, sticky=E)
+e_tts.grid(row=2, column=4, sticky=E)
 
 tts_button = Button(root, text='TTS下发', command=send_tts)
-tts_button.grid(row=2, column=3, sticky=W)
+tts_button.grid(row=3, column=3, sticky=W)
 
 blank2 = Label(root, text='')
 blank2.grid(row=3, column=3, sticky=W)
