@@ -171,11 +171,11 @@ def parse_route_id(data):
 
 
 def parse_query_upgrade(data):
-    terminal_type = data[13:15]
-    manufacture_id = data[15:20]
-    terminal_model = data[20:40]
-    terminal_id = data[40:47]
-    terminal_SIM = data[47:57]
+    terminal_type = byte2str(data[13:15])
+    manufacture_id = byte2str(data[15:20])
+    terminal_model = byte2str(data[20:40])
+    terminal_id = byte2str(data[40:47])
+    terminal_SIM = byte2str(data[47:57])
     hardware = data[58:90].decode('utf-8')
     firmware = data[91:123].decode('utf-8')
     software = data[124:156].decode('utf-8')

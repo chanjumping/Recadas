@@ -74,6 +74,8 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
                     logger.debug('Receiving ack timeout，connection is interrupted.')
                 except ConnectionResetError:
                     logger.debug('ConnectionResetError，connection is interrupted.')
+                except ConnectionAbortedError:
+                    logger.debug('ConnectionAbortedError，connection is interrupted.')
             except socket.timeout:
                 break
             if not buf:

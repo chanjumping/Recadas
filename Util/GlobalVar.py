@@ -184,6 +184,8 @@ alarm_type_code_jt808 = {
     177: 'IdentifySuccess',
     33: 'LeftLCWGeneral',
     34: 'RightLCWGeneral',
+    161: '行车安全提示',
+    162: '安全提醒'
 }
 
 # 苏标工作状态
