@@ -7,6 +7,7 @@ from ServerModel.TCPRequestHandler import TCPRequestHandler, ThreadedTCPServer
 import threading
 from Util.Gui import loop
 from Util.ReadConfig import conf
+from SaveModel.SaveMediaThread import SaveMediaThread
 
 path = os.path.realpath(__file__)
 sep = os.sep
@@ -22,6 +23,9 @@ def main():
     server_thread.daemon = True
     server_thread.start()
     logger.debug('Server starting, waiting for connection ...')
+    save_thread = SaveMediaThread('SaveMedia Thread Start ...')
+    save_thread.setDaemon(True)
+    save_thread.start()
 
     loop()
 

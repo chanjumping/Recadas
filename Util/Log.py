@@ -23,7 +23,7 @@ else:
 # 创建一个handler，用于写入日志文件
 fh = logging.handlers.RotatingFileHandler(r'Logs/log{}.log'.format(m + 1), maxBytes=104857600, backupCount=50)
 fh.setLevel(logging.DEBUG)
-fh_ev = logging.handlers.RotatingFileHandler(r'logs/log_event{}.log'.format(m + 1), maxBytes=20480000, backupCount=50)
+fh_ev = logging.handlers.RotatingFileHandler(r'Logs/log_event{}.log'.format(m + 1), maxBytes=20480000, backupCount=50)
 fh_ev.setLevel(logging.DEBUG)
 
 # 再创建一个handler，用于输出到控制台

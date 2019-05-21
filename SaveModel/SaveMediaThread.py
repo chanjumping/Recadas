@@ -7,19 +7,18 @@ from Util.ReadConfig import conf
 
 
 class SaveMediaThread(threading.Thread):
-    def __init__(self, name, rec_obj):
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
         self.setName(self.name)
         self.media_name = None
         self.buf = b''
-        self.rec_obj = rec_obj
 
     def run(self):
         logger.debug(threading.current_thread().getName())
-        while self.rec_obj.isAlive:
-            while not media_queue.empty():
-                if conf.get_protocol_type() == 1:
+        while True:
+            if conf.get_protocol_type() == 1:
+                while not media_queue.empty():
                     data = media_queue.get(block=False)
                     media_data = data[17:-1]
                     self.buf += media_data
@@ -57,7 +56,8 @@ class SaveMediaThread(threading.Thread):
                                 media_alarm_code.pop(media_id)
                         except KeyError:
                             logger.error('media_id{}不存在。'.format(media_id))
-                elif conf.get_protocol_type() == 3:
+            elif conf.get_protocol_type() == 3:
+                while not media_queue.empty():
                     data = media_queue.get(block=False)
                     total_pkg = big2num(byte2str(data[13:15]))
                     pkg_no = big2num(byte2str(data[15:17]))
@@ -100,7 +100,8 @@ class SaveMediaThread(threading.Thread):
                                 logger.error(FileNotFoundError)
                             self.buf = b''
                             self.media_name = ''
-                elif conf.get_protocol_type() == 5:
+            elif conf.get_protocol_type() == 5:
+                while not media_queue.empty():
                     data = media_queue.get(block=False)
                     media_name = data[4:54].split(b'\x00')[0].decode('utf-8')
                     media_size = name_size.get(media_name)

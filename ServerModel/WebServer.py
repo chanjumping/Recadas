@@ -5,6 +5,7 @@ import os
 from urllib.parse import urlparse
 from Util.Log import logger
 from Util.CommonMethod import get_md5
+from Util.ReadConfig import conf
 
 curdir = os.path.dirname(os.path.realpath(__file__))
 root = os.path.join(curdir, 'root')
@@ -80,8 +81,8 @@ class WebServer(BaseHTTPRequestHandler):
 
 
 def run_http_server():
-    addr = '192.168.100.100'
-    port = 9090
+    addr = conf.get_address()
+    port = conf.get_address()
 
     server_address = (addr, port)
     logger.debug('Starting HTTP Server ... IP {} Port {}'.format(addr, port))

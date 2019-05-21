@@ -138,8 +138,8 @@ def parse_register_su_dev(data):
 # 苏标终端下发服务器命令
 def send_server_command_su_dev(alarm_flag):
     logger.debug('—————— 下发服务器地址 ——————')
-    server = '103.46.128.43'
-    port = 28388
+    server = conf.get_file_address()
+    port = conf.get_file_port()
     msg_body = num2big(len(server), 1) + str2hex(server, len(server)) + num2big(port, 2) + '0000' + alarm_flag + \
                str2hex(str(int(time.time()*1000000)), 16)*2 + '00' * 16
     body = '%s%s%s%s%s' % ('9208', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, num2big(

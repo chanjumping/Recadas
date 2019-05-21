@@ -12,6 +12,7 @@ from ParseModel.ParseGetMediaThread import GetMediaThread
 from Util.ReadConfig import conf
 from ParseModel import ParseData
 from ServerModel.WebServer import run_http_server
+from ServerModel.SendData import SendData
 
 
 class TCPRequestHandler(socketserver.BaseRequestHandler):
@@ -24,11 +25,13 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
             self.request.settimeout(self.timeOut)
 
     def handle(self):
+        print(threading.current_thread().getName())
         address, port = self.client_address
         logger.debug('Connected by {} {} ...'.format(address, port))
         TCPRequestHandler.isAlive = True
         logger.debug('Producer Thread Start ...')
-        send_thread = threading.Thread(target=self.send, name='Send Thread Start ...')
+        # send_thread = threading.Thread(target=self.send)
+        send_thread = SendData('Send Thread Start ...', self)
         send_thread.setDaemon(True)
         send_thread.start()
         consume_thread = Consumer('Consumer Thread Start ...', self)
@@ -37,9 +40,6 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
         parse_thread = ParseComm('Parse Thread Start ...', self)
         parse_thread.setDaemon(True)
         parse_thread.start()
-        save_thread = SaveMediaThread('SaveMedia Thread Start ...', self)
-        save_thread.setDaemon(True)
-        save_thread.start()
         get_media_thread = GetMediaThread('GetMedia Thread Start ...', self)
         get_media_thread.setDaemon(True)
         get_media_thread.start()
@@ -79,21 +79,22 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
             except socket.timeout:
                 break
             if not buf:
+                self.isAlive = False
+                time.sleep(1)
                 logger.debug('Receive empty data，connection is interrupted.')
                 break
             self.remain = ParseData.produce(buf, self.remain)
             time.sleep(0.001)
-
-    def send(self):
-        logger.debug(threading.current_thread().getName())
-        while self.isAlive:
-            text = ParseData.send_queue_data()
-            if text:
-                self.request.sendall(text)
-            time.sleep(0.001)
+    #
+    # def send(self):
+    #     logger.debug(threading.current_thread().getName())
+    #     while self.isAlive:
+    #         text = ParseData.send_queue_data()
+    #         if text:
+    #             self.request.sendall(text)
+    #         time.sleep(0.001)
 
     def finish(self):
-        self.isAlive = False
         address, port = self.client_address
         logger.debug('Connection {} {} is disconnected.'.format(address, port))
         logger.debug('-'*100)

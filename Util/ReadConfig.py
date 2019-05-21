@@ -21,6 +21,8 @@ class ReadConfig:
         self.get_media_flag = True
         self.address = '192.168.100.100'
         self.port = 8888
+        self.file_address = '103.46.128.43'
+        self.file_port = 9090
 
     def get_config(self):
         content = open(conf_path, encoding='utf-8').read()
@@ -36,6 +38,8 @@ class ReadConfig:
         self.set_get_media_flag(config.getboolean('config', 'get_media'))
         self.set_address(config.get('config', 'address'))
         self.set_port(config.getint('config', 'port'))
+        self.set_file_address(config.get('config', 'file_address'))
+        self.set_file_port(config.getint('config', 'file_port'))
 
     def set_sync_flag(self, value):
         self.sync_flag = value
@@ -66,6 +70,18 @@ class ReadConfig:
 
     def get_port(self):
         return self.port
+
+    def set_file_address(self, value):
+        self.file_address = value
+
+    def get_file_address(self):
+        return self.file_address
+
+    def set_file_port(self, value):
+        self.file_port = value
+
+    def get_file_port(self):
+        return self.file_port
 
 
 conf = ReadConfig()
