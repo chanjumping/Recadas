@@ -16,7 +16,6 @@ def produce(buf, remain):
                 continue
             if not st_list[x] == st_list[-1]:
                 if st_list[x]+1 == st_list[x+1]:
-                    logger.info(data[st_list[x]:st_list[x]+2])
                     continue
             for y in range(x + 1, len(st_list)):
                 data_piece = rec_translate(data[st_list[x]:st_list[y] + 1])
@@ -129,7 +128,9 @@ def produce(buf, remain):
                     remain = data
                 else:
                     data_piece = data[:62 + big2num(byte2str(data_length))]
-                    media_queue.put(data_piece)
+                    media_name = data_piece[4:54].split(b'\x00')[0].decode('utf-8')
+                    offset = big2num(byte2str(data_piece[54:58]))
+                    name_offset_data.get(media_name)[offset] = data_piece
                     text = byte2str(data)[:200]
                     text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
                     logger.debug('%s%s%s%s%s' % ("RECV DATA:   ", 'lens: ',

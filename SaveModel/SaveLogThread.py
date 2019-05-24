@@ -6,18 +6,18 @@ from Util.GlobalVar import *
 
 
 class SaveLogThread(threading.Thread):
-    def __init__(self, name, rec_obj):
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
         self.setName(self.name)
         self.media_name = None
         self.buf = b''
-        self.rec_obj = rec_obj
+        # self.rec_obj = rec_obj
 
     def run(self):
         logger.debug(threading.current_thread().getName())
         buf = b''
-        while self.rec_obj.isAlive:
+        while True:
             while not log_queue.empty():
                 data = log_queue.get(block=False)
                 total_num = big2num(byte2str(data[8:10]))

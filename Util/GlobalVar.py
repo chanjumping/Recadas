@@ -230,12 +230,10 @@ last_pkg_media_id = {}
 media_id_driver_id = {}
 
 
-# 顺丰相关
-
-
 # 苏标终端
 name_size = {}
-
+# 记录文件名称和多媒体偏移量和数据片段长度的关系{name:{offset:length}}
+name_offset_data = {}
 
 # # 初始流水号
 serial_no = 0

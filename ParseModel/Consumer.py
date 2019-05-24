@@ -8,15 +8,15 @@ from ParseModel.Parse_SF import *
 
 
 class Consumer(threading.Thread):
-    def __init__(self, name, rec_obj):
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
-        self.rec_obj = rec_obj
+        # self.rec_obj = rec_obj
         self.setName(self.name)
 
     def run(self):
         logger.debug(threading.current_thread().getName())
-        while self.rec_obj.isAlive:
+        while True:
             while not rec_queue.empty():
                 try:
                     data = rec_queue.get_nowait()
@@ -132,15 +132,15 @@ parse_type_sf = {
 
 
 class ParseComm(threading.Thread):
-    def __init__(self, name, rec_obj):
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
-        self.rec_obj = rec_obj
+        # self.rec_obj = rec_obj
         self.setName(self.name)
 
     def run(self):
         logger.debug(threading.current_thread().getName())
-        while self.rec_obj.isAlive:
+        while True:
             try:
                 data, command = common_queue.get_nowait()
             except queue.Empty:

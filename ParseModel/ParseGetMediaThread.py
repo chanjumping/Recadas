@@ -22,15 +22,15 @@ class GetMediaThread(threading.Thread):
     current_media_id = 0
     rec_pkg_list = []
 
-    def __init__(self, name, rec_obj):
+    def __init__(self, name):
         threading.Thread.__init__(self)
         self.name = name
         self.setName(self.name)
-        self.rec_obj = rec_obj
+        # self.rec_obj = rec_obj
 
     def run(self):
         logger.debug(threading.current_thread().getName())
-        while self.rec_obj.isAlive:
+        while True:
             try:
                 data, command = rec_alarm_queue.get_nowait()
             except queue.Empty:
@@ -145,7 +145,6 @@ class GetMediaThread(threading.Thread):
     # 解析JT808多媒体数据上传
     @staticmethod
     def parse_media_upload(data):
-        data_bak = data
         jt808_serial_no = big2num(byte2str(data[11:13]))
         # 消息体属性
         msg_property = big2num(byte2str(data[3:5]))

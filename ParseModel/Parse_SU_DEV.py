@@ -173,6 +173,8 @@ def parse_media_msg_upload_su_dev(data):
     media_type = byte2str(data[-7:-6])
     media_size = big2num(byte2str(data[-6:-2]))
     name_size[media_name] = media_size
+    quotient = media_size//65536
+    name_offset_data[media_name] = dict(zip([x * 65536 for x in range(quotient + 1)], [None] * quotient))
     logger.debug('—————— 文件信息上传 ——————')
     logger.debug('文件名 {}'.format(media_name))
     logger.debug('文件类型 {}'.format(media_type))
@@ -185,10 +187,13 @@ def parse_media_msg_upload_su_dev(data):
 
 # 苏标终端告警上传结束标识
 def parse_media_upload_finish_su_dev(data):
+    loss_pkg_list = []
     name_len = data[13:14]
     media_name = data[14:14 + big2num(byte2str(name_len))].split(b'\x00')[0].decode('utf-8')
     media_type = byte2str(data[-7:-6])
     media_size = big2num(byte2str(data[-6:-2]))
+    quotient = media_size//65536
+    remainder = media_size % 65536
     logger.debug('—————— 告警结束 ——————')
     logger.debug('文件名 {}'.format(media_name))
     logger.debug('文件类型 {} '.format(media_type))
@@ -198,7 +203,32 @@ def parse_media_upload_finish_su_dev(data):
     filename_length = data[13:14]
     file_name = data[14:14 + big2num(byte2str(filename_length))]
     file_type = data[-7:-6]
-    msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '00' + '00'
+    offset_data = name_offset_data.get(media_name)
+
+    # if len(offset_data) > 1:
+    #     offset_data[0] = None
+    #     offset_data[65536] = None
+    for x in offset_data.keys():
+        if not offset_data.get(x):
+            loss_pkg_list.append(x)
+    if not loss_pkg_list:
+        msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '00' + '00'
+        for x in sorted(offset_data.keys()):
+            media_queue.put(offset_data.get(x))
+        name_offset_data.pop(media_name)
+    else:
+        loss_pkg = ''
+        loss_len = len(loss_pkg_list)
+        logger.info("{} 多媒体数据丢包，丢包偏移量为 {}".format(media_name, loss_pkg_list))
+        if quotient in loss_pkg_list:
+            loss_pkg_list.pop(quotient)
+            for x in loss_pkg_list:
+                loss_pkg += num2big(x, 4) + num2big(65536, 4)
+            loss_pkg += num2big(quotient, 4) + num2big(remainder, 4)
+        else:
+            for x in loss_pkg_list:
+                loss_pkg += num2big(x, 4) + num2big(65536, 4)
+        msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '01' + num2big(loss_len, 1) + loss_pkg
     body = '%s%s%s%s%s' % ('9212', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, num2big(
         GlobalVar.get_serial_no()), msg_body)
     data = '%s%s%s%s' % ('7E', body, calc_check_code(body), '7E')
