@@ -16,7 +16,7 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
         if conf.get_protocol_type() == 1:
             self.timeOut = None
         else:
-            self.timeOut = 20
+            self.timeOut = 25
         self.remain = b''
         self.isAlive = True
         self.request.settimeout(self.timeOut)
@@ -47,16 +47,25 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
                 try:
                     buf = self.request.recv(1024)
                 except TimeoutError:
+                    self.isAlive = False
+                    time.sleep(0.3)
                     logger.debug('【 Data Server 】 Receiving ack timeout，connection is interrupted.')
                 except ConnectionResetError:
+                    self.isAlive = False
+                    time.sleep(0.3)
                     logger.debug('【 Data Server 】 ConnectionResetError，connection is interrupted.')
                 except ConnectionAbortedError:
+                    self.isAlive = False
+                    time.sleep(0.3)
                     logger.debug('【 Data Server 】 ConnectionAbortedError，connection is interrupted.')
             except socket.timeout:
+                self.isAlive = False
+                time.sleep(0.3)
+                logger.debug('【 Data Server 】 Receiving data timeout，connection is interrupted.')
                 break
             if not buf:
                 self.isAlive = False
-                time.sleep(0.1)
+                time.sleep(0.3)
                 logger.debug('【 Data Server 】 Receive empty data，connection is interrupted.')
                 break
             self.remain = ParseData.produce(buf, self.remain)
@@ -100,11 +109,13 @@ class TCPRequestHandlerForFile(socketserver.BaseRequestHandler):
                     logger.debug('【 File Server 】 ConnectionResetError，connection is interrupted.')
                 except ConnectionAbortedError:
                     logger.debug('【 File Server 】 ConnectionAbortedError，connection is interrupted.')
+                except Exception as e:
+                    logger.error(e)
             except socket.timeout:
                 break
             if not buf:
                 self.isAlive = False
-                time.sleep(0.1)
+                time.sleep(0.3)
                 logger.debug('【 File Server 】 Receive empty data，connection is interrupted.')
                 break
             self.remain = ParseData.produce(buf, self.remain)

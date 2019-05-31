@@ -29,8 +29,8 @@ def main():
     server_thread.start()
     logger.debug('【 Data Server 】 Server starting, waiting for connection ...')
     if conf.get_protocol_type() == 5:
-        FILE_HOST = conf.get_file_address()
-        FILE_PORT = conf.get_file_port()
+        FILE_HOST = '192.168.100.100'
+        FILE_PORT = 8080
         file_server = ThreadedTCPServer((FILE_HOST, FILE_PORT), TCPRequestHandlerForFile)
         file_server_thread = threading.Thread(target=file_server.serve_forever)
         file_server_thread.daemon = True

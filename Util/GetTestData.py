@@ -57,9 +57,30 @@ class GetTestData(object):
             if conf.get_protocol_type() == 1:
                 # 判断发送和期待报文的流水号是否为空
                 if not send_data_value_list[2]:
-                    send_data_value_list[2] = GlobalVar.get_serial_no()
+                    send_data_value_list[2] = get_serial_no()
                 if not expc_data_value_list[2]:
                     expc_data_value_list[2] = send_data_value_list[2]
+
+                # 如果长度为Auto，则自动计算字段长度
+                for x in range(len(send_data_len_list)):
+                    if send_data_len_list[x] == 'Auto':
+                        if send_data_value_list[x][:2] == '0s':
+                            send_data_len_list[x] = int(len(send_data_value_list[x][2:])/2)
+                        else:
+                            send_data_len_list[x] = len(send_data_value_list[x])
+                            send_data_value_list[x] = str(send_data_value_list[x])
+                        if not send_data_value_list[x-1]:
+                            send_data_value_list[x-1] = send_data_len_list[x]
+
+                for x in range(len(expc_data_len_list)):
+                    if expc_data_len_list[x] == 'Auto':
+                        if expc_data_value_list[x][:2] == '0s':
+                            expc_data_len_list[x] = int(len(expc_data_value_list[x][2:])/2)
+                        else:
+                            expc_data_len_list[x] = len(expc_data_value_list[x])
+                            expc_data_value_list[x] = str(expc_data_value_list[x])
+                        if not expc_data_value_list[x-1]:
+                            expc_data_value_list[x-1] = expc_data_len_list[x]
 
                 # 读取出每个excel单元格中的数据
                 send_data_deal_list = list(map(read_value, send_data_value_list))
@@ -98,9 +119,9 @@ class GetTestData(object):
                         else:
                             send_data_len_list[x] = len(send_data_value_list[x])
                             send_data_value_list[x] = str(send_data_value_list[x])
+                        # 若长度字段填写为Auto，且上一个字段内容为空，则自动计算Auto字段的长度填入上一字段
                         if not send_data_value_list[x-1]:
                             send_data_value_list[x-1] = send_data_len_list[x]
-
                 for x in range(len(expc_data_len_list)):
                     if expc_data_len_list[x] == 'Auto':
                         if expc_data_value_list[x][:2] == '0s':

@@ -203,7 +203,7 @@ def data2hex(data, lens):
             return data[2:]
         elif isinstance(data, bytes):
             if len(data) < lens:
-                return (int(lens) - len(data))*'00' + byte2str(data)
+                return byte2str(data) + (int(lens) - len(data))*'00'
             else:
                 return byte2str(data)
         else:

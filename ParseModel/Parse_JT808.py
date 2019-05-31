@@ -70,9 +70,9 @@ def parse_authentication_jt808(data):
     reply_data = comm_reply_jt808(data, '00')
     send_queue.put(reply_data)
 
-    # start_test_thread = threading.Thread(target=start_test_jt808)
-    # start_test_thread.setDaemon(True)
-    # start_test_thread.start()
+    start_test_thread = threading.Thread(target=start_test_jt808)
+    start_test_thread.setDaemon(True)
+    start_test_thread.start()
 
 
 # 注册
@@ -147,7 +147,7 @@ def parse_upgrade_result_jt808(data):
 
 
 # 行程ID
-def parse_route_id(data):
+def parse_route_id_jt808(data):
     route_id = byte2str(data[13:15])
     start_time = byte2str(data[15:21])
     end_time = byte2str(data[21:27])
@@ -170,7 +170,7 @@ def parse_route_id(data):
     logger.debug('———————————————— END ————————————————')
 
 
-def parse_query_upgrade(data):
+def parse_query_upgrade_jt808(data):
     terminal_type = byte2str(data[13:15])
     manufacture_id = byte2str(data[15:20])
     terminal_model = byte2str(data[20:40])
@@ -190,10 +190,28 @@ def parse_query_upgrade(data):
     logger.debug('软件版本 {}'.format(software))
     logger.debug('———————————————— END ————————————————')
 
+    start_test_thread = threading.Thread(target=start_test_jt808)
+    start_test_thread.setDaemon(True)
+    start_test_thread.start()
 
-def parse_driver_manage(data):
-    reply_serial_no = data[13:15]
-    reply_id = data[15:17]
+
+# 解析立即拍照应答
+def parse_take_picture_jt808(data):
+    reply_serial_no = byte2str(data[13:15])
+    result = byte2str(data[15:16])
+    media_num = byte2str(data[16:18])
+    media_no = byte2str(data[18:-2])
+    logger.debug('———————————————— 立即拍照应答 ————————————————')
+    logger.debug('应答流水号 {}'.format(reply_serial_no))
+    logger.debug('应答结果 {}'.format(result))
+    logger.debug('多媒体数量 {}'.format(media_num))
+    logger.debug('多媒体ID {}'.format(media_no))
+    logger.debug('———————————————— END ————————————————')
+
+
+def parse_driver_manage_jt808(data):
+    reply_serial_no = byte2str(data[13:15])
+    reply_id = byte2str(data[15:17])
     json_data = data[17:-2].decode('utf-8')
     logger.debug('———————————————— 司机身份管理命令执行结果 ————————————————')
     logger.debug('应答流水号 {}'.format(reply_serial_no))
@@ -204,9 +222,14 @@ def parse_driver_manage(data):
 
 # 不断重启抓取DSM和ADAS图像
 def start_test_jt808():
-    time.sleep(30)
-    send_queue.put('7E 88 01 00 0C 00 02 18 51 06 24 00 F1 02 00 00 00 00 00 00 00 00 00 00 00 1F 7E')
+    # time.sleep(30)
+    # send_queue.put('7E 88 01 00 0C 00 02 18 51 06 24 00 F1 02 00 00 00 00 00 00 00 00 00 00 00 1F 7E')
+    # time.sleep(10)
+    # send_queue.put('7E 88 01 00 0C 00 02 18 51 06 24 00 F8 01 00 00 00 00 00 00 00 00 00 00 00 15 7E')
+    # time.sleep(30)
+    # send_queue.put('7E 8F 01 00 00 00 02 18 51 06 24 00 FE 19 7E')
+
     time.sleep(10)
-    send_queue.put('7E 88 01 00 0C 00 02 18 51 06 24 00 F8 01 00 00 00 00 00 00 00 00 00 00 00 15 7E')
-    time.sleep(30)
-    send_queue.put('7E 8F 01 00 00 00 02 18 51 06 24 00 FE 19 7E')
+    logger.debug('———————————————— 下发升级指令 ————————————————')
+    reboot = '7E 8F A1 00 BA 00 02 18 51 06 24 00 A7 01 01 01 6C 51 73 f9 d9 36 d3 fc dc 38 c6 d5 40 34 61 8d cc a3 35 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 52 57 5F 43 41 5F 46 57 5F 56 31 30 30 52 30 30 31 42 30 31 32 53 50 30 31 00 00 00 00 00 00 00 20 52 57 5F 43 41 5F 53 57 5F 56 31 30 30 52 30 30 31 42 31 30 33 53 50 30 34 00 00 00 00 00 00 00 40 68 74 74 70 3A 2F 2F 6A 75 6D 70 69 6E 67 35 31 32 2E 69 6D 77 6F 72 6B 2E 6E 65 74 3A 32 38 33 38 38 2F 52 57 5F 43 41 5F 53 57 5F 56 31 30 30 52 30 30 31 42 31 30 33 73 70 30 33 2E 7A 69 70 2D 7E'
+    send_queue.put(reboot)

@@ -98,9 +98,10 @@ parse_type_jt808 = {
     b'\x01\x04': lambda x: parse_query_para_jt808(x),
     b'\x01\x08': lambda x: parse_upgrade_result_jt808(x),
     b'\x00\x01': lambda x: parse_device_comm_reply_jt808(x),
-    b'\x8f\x03': lambda x: parse_route_id(x),
-    b'\x0f\xa1': lambda x: parse_query_upgrade(x),
-    b'\x8B\x01': lambda x: parse_driver_manage(x),
+    b'\x8f\x03': lambda x: parse_route_id_jt808(x),
+    b'\x0f\xa1': lambda x: parse_query_upgrade_jt808(x),
+    b'\x8B\x01': lambda x: parse_driver_manage_jt808(x),
+    b'\x08\x05': lambda x: parse_take_picture_jt808(x),
 }
 parse_type_su_dev = {
     LOCATION_UPLOAD: lambda x: parse_location_upload_su_dev(x),
@@ -115,6 +116,9 @@ parse_type_su_dev = {
     b'\x09\x00': lambda x: parse_upload_msg_su_dev(x),
     b'\x01\x04': lambda x: parse_query_para_su_dev(x),
     b'\x01\x08': lambda x: parse_upgrade_result_su_dev(x),
+    b'\x08\x05': lambda x: parse_take_picture_su_dev(x),
+    b'\x00\x01': lambda x: parse_device_comm_reply_su_dev(x),
+
 }
 
 parse_type_sf = {

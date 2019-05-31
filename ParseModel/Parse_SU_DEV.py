@@ -6,6 +6,13 @@ from Util import GlobalVar
 from Util.Log import log_event
 from Util.CommonMethod import *
 
+comm_type = {
+    b'\x81\x03': '设置终端参数',
+    b'\x81\x00': '下发TTS语音',
+    b'\x92\x08': '下发服务器地址',
+    b'\x92\x11': '新增0x9211'
+}
+
 
 # 通用应答
 def comm_reply_su_dev(data, reply_result):
@@ -17,6 +24,15 @@ def comm_reply_su_dev(data, reply_result):
     return data
 
 
+# 解析苏标终端通用应答
+def parse_device_comm_reply_su_dev(data):
+    comm = data[15:17]
+    serial_no = byte2str(data[13:15])
+    result = byte2str(data[17:18])
+    type_name = comm_type.get(comm)
+    logger.debug('—————— 收到 {} 的通用应答 流水号 {} 应答结果 {} ——————'.format(type_name, serial_no, result))
+
+
 # 解析位置上报
 def parse_location_upload_su_dev(data):
     state = byte2str(data[17:21])
@@ -24,8 +40,8 @@ def parse_location_upload_su_dev(data):
         gps_state = '定位失败'
     else:
         gps_state = '定位成功'
-    latitude = byte2str(data[21:25])
-    longitude = byte2str(data[25:29])
+    latitude = big2num(byte2str(data[21:25]))
+    longitude = big2num(byte2str(data[25:29]))
     speed = big2num(byte2str(data[31:33]))
     alarm_time = byte2str(data[35:41])
     logger.debug('—————— 状态 {} 速度 {} km/h {} 纬度 {} 经度 {} 时间 {} ——————'.format(state, speed/10, gps_state, latitude, longitude, alarm_time))
@@ -55,8 +71,8 @@ def parse_location_upload_su_dev(data):
                 road_identify_data = byte2str(data[54:55])
                 speed = big2num(byte2str(data[55:56]))
                 height = byte2str(data[55:59])
-                latitude = byte2str(data[59:63])
-                longitude = byte2str(data[63:67])
+                latitude = big2num(byte2str(data[59:63]))
+                longitude = big2num(byte2str(data[63:67]))
                 alarm_time = byte2str(data[66:72])
                 car_state = byte2str(data[72:74])
                 alarm_flag = byte2str(data[74:90])
@@ -73,8 +89,8 @@ def parse_location_upload_su_dev(data):
                 retain = byte2str(data[51:55])
                 speed = big2num(byte2str(data[55:56]))
                 height = byte2str(data[56:58])
-                latitude = byte2str(data[58:62])
-                longitude = byte2str(data[62:66])
+                latitude = big2num(byte2str(data[58:62]))
+                longitude = big2num(byte2str(data[62:66]))
                 alarm_time = byte2str(data[66:72])
                 car_state = byte2str(data[72:74])
                 alarm_flag = byte2str(data[74:90])
@@ -88,8 +104,8 @@ def parse_location_upload_su_dev(data):
                 alarm_type = alarm_type_code_su_dev_bsd.get(event_type)
                 speed = big2num(byte2str(data[49:50]))
                 height = byte2str(data[50:52])
-                latitude = byte2str(data[52:56])
-                longitude = byte2str(data[56:60])
+                latitude = big2num(byte2str(data[52:56]))
+                longitude = big2num(byte2str(data[56:60]))
                 alarm_time = byte2str(data[60:66])
                 car_state = byte2str(data[66:70])
                 alarm_flag = byte2str(data[70:86])
@@ -140,8 +156,13 @@ def send_server_command_su_dev(alarm_flag):
     logger.debug('—————— 下发服务器地址 ——————')
     server = conf.get_file_address()
     port = conf.get_file_port()
+    control = '55'
+    if control == 'AA':
+        upload = '04'
+    else:
+        upload = '00'
     msg_body = num2big(len(server), 1) + str2hex(server, len(server)) + num2big(port, 2) + '0000' + alarm_flag + \
-               str2hex(str(int(time.time()*1000000)), 16)*2 + '00' * 16
+               str2hex(str(int(time.time()*1000000)), 16)*2 + control + upload + '00' * 14
     body = '%s%s%s%s%s' % ('9208', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, num2big(
         GlobalVar.get_serial_no()), msg_body)
     data = '%s%s%s%s' % ('7E', body, calc_check_code(body), '7E')
@@ -150,9 +171,9 @@ def send_server_command_su_dev(alarm_flag):
 
 # 苏标终端告警附件信息
 def parse_alarm_attachment_msg_su_dev(data):
-    terminal_id = byte2str(data[13:20])
+    terminal_id = data[13:20].decode('utf-8')
     alarm_flag = byte2str(data[20:36])
-    alarm_num = big2num(byte2str(data[36:68]))
+    alarm_num = byte2str(data[36:68])
     msg_type = byte2str(data[68:69])
     attachment_num = big2num(byte2str(data[69:70]))
     logger.debug('—————— 报警附件信息 ——————')
@@ -161,6 +182,16 @@ def parse_alarm_attachment_msg_su_dev(data):
     logger.debug('报警编号 {}'.format(alarm_num))
     logger.debug('信息类型 {}'.format(msg_type))
     logger.debug('附件数量 {}'.format(attachment_num))
+    attachment_data = data[70:-2]
+    while len(attachment_data):
+        name_len = big2num(byte2str(attachment_data[0:1]))
+        logger.debug('文件名称长度 {}'.format(name_len))
+        name = attachment_data[1:1+name_len].decode('utf-8')
+        logger.debug('文件名称 {}'.format(name))
+        file_size = big2num(byte2str(attachment_data[1+name_len:1+name_len+4]))
+        logger.debug('文件大小 {}'.format(file_size))
+        attachment_data = attachment_data[1+name_len+4:]
+
     logger.debug('—————— END ——————')
     reply_data = comm_reply_su_dev(data, '00')
     send_queue.put(reply_data)
@@ -522,3 +553,16 @@ def parse_upgrade_result_su_dev(data):
     upgrade_type = byte2str(data[13:14])
     upgrade_result = byte2str(data[14:15])
     logger.debug('—————— 终端升级结果: 升级类型 {} 升级结果 ——————'.format(upgrade_type, upgrade_result))
+
+
+def parse_take_picture_su_dev(data):
+    reply_serial_no = byte2str(data[13:15])
+    result = byte2str(data[15:16])
+    media_num = byte2str(data[16:18])
+    media_no = byte2str(data[18:-2])
+    logger.debug('———————————————— 立即拍照应答 ————————————————')
+    logger.debug('应答流水号 {}'.format(reply_serial_no))
+    logger.debug('应答结果 {}'.format(result))
+    logger.debug('多媒体数量 {}'.format(media_num))
+    logger.debug('多媒体ID {}'.format(media_no))
+    logger.debug('———————————————— END ————————————————')

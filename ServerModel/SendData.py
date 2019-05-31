@@ -27,4 +27,6 @@ class SendData(threading.Thread):
                     logger.debug('ConnectionResetError，connection is interrupted.')
                 except ConnectionAbortedError:
                     logger.debug('ConnectionAbortedError，connection is interrupted.')
+                except OSError:
+                    logger.debug('SEND DATA THREAD {}'.format(self.rec_obj.request))
             time.sleep(0.001)
