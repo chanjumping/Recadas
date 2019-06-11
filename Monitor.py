@@ -7,7 +7,7 @@ import datetime
 
 
 while True:
-    order = 'adb shell free -m'
+    order = 'adb logcat'
 
     pi = subprocess.Popen(order, shell=True, stdout=subprocess.PIPE)
 
@@ -17,3 +17,6 @@ while True:
         line = line.strip('\r')
         if line:
             print(line)
+        else:
+            break
+    time.sleep(10)

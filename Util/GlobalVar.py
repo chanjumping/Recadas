@@ -145,7 +145,7 @@ alarm_type_code_su_dev_bsd = {
     b'\x03': '右侧后方接近报警',
 }
 
-# 非苏标告警类型名称
+# 瑞为告警类型名称
 alarm_type_code = {
     1: 'Careful',
     2: 'Forward',
@@ -188,7 +188,7 @@ alarm_type_code_jt808 = {
     162: '安全提醒'
 }
 
-# 苏标工作状态
+# 苏标外设工作状态
 work_state_dict = {
     1: '正常工作',
     2: '待机状态',

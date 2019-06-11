@@ -44,7 +44,7 @@ class GetMediaThread(threading.Thread):
                     func = parse_type.get(command)
                     if func:
                         func(data)
-                elif conf.get_protocol_type() == 3:
+                elif conf.get_protocol_type() == 3 or conf.get_protocol_type() == 5:
                     GetMediaThread.parse_media_upload(data)
             time.sleep(0.001)
 

@@ -156,9 +156,9 @@ def send_server_command_su_dev(alarm_flag):
     logger.debug('—————— 下发服务器地址 ——————')
     server = conf.get_file_address()
     port = conf.get_file_port()
-    control = '55'
+    control = '00'
     if control == 'AA':
-        upload = '04'
+        upload = '05'
     else:
         upload = '00'
     msg_body = num2big(len(server), 1) + str2hex(server, len(server)) + num2big(port, 2) + '0000' + alarm_flag + \

@@ -70,10 +70,6 @@ def parse_authentication_jt808(data):
     reply_data = comm_reply_jt808(data, '00')
     send_queue.put(reply_data)
 
-    start_test_thread = threading.Thread(target=start_test_jt808)
-    start_test_thread.setDaemon(True)
-    start_test_thread.start()
-
 
 # 注册
 def parse_register_jt808(data):
@@ -190,9 +186,9 @@ def parse_query_upgrade_jt808(data):
     logger.debug('软件版本 {}'.format(software))
     logger.debug('———————————————— END ————————————————')
 
-    start_test_thread = threading.Thread(target=start_test_jt808)
-    start_test_thread.setDaemon(True)
-    start_test_thread.start()
+    # start_test_thread = threading.Thread(target=start_test_jt808)
+    # start_test_thread.setDaemon(True)
+    # start_test_thread.start()
 
 
 # 解析立即拍照应答

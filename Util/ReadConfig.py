@@ -22,7 +22,9 @@ class ReadConfig:
         self.address = '192.168.100.100'
         self.port = 8888
         self.file_address = '103.46.128.43'
-        self.file_port = 9090
+        self.file_port = 28388
+        self.file_address_local = '103.46.128.43'
+        self.file_port_local = 28388
 
     def get_config(self):
         content = open(conf_path, encoding='utf-8').read()
@@ -40,6 +42,8 @@ class ReadConfig:
         self.set_port(config.getint('config', 'port'))
         self.set_file_address(config.get('config', 'file_address'))
         self.set_file_port(config.getint('config', 'file_port'))
+        self.set_file_address_local(config.get('config', 'file_address_local'))
+        self.set_file_port_local(config.getint('config', 'file_port_local'))
 
     def set_sync_flag(self, value):
         self.sync_flag = value
@@ -82,6 +86,18 @@ class ReadConfig:
 
     def get_file_port(self):
         return self.file_port
+
+    def set_file_address_local(self, value):
+        self.file_address_local = value
+
+    def get_file_address_local(self):
+        return self.file_address_local
+
+    def set_file_port_local(self, value):
+        self.file_port_local = value
+
+    def get_file_port_local(self):
+        return self.file_port_local
 
 
 conf = ReadConfig()

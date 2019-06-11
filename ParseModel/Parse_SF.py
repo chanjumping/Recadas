@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*
 
 from Util.GlobalVar import *
-from Util.Log import log_event
 from Util.CommonMethod import *
 
 
