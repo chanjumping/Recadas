@@ -19,4 +19,4 @@ while True:
             print(line)
         else:
             break
-    time.sleep(10)
+    time.sleep(3)

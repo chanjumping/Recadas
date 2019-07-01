@@ -12,6 +12,7 @@ from ParseModel.Consumer import ParseComm, Consumer
 from ParseModel.ParseGetMediaThread import GetMediaThread
 from Util.GlobalVar import query_msg_queue
 from ServerModel.WebServer import run_http_server
+# from Util.Gui_main import MainWindow
 
 
 path = os.path.realpath(__file__)

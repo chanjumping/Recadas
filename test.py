@@ -1,9 +1,11 @@
-import socket
+import requests
+from Util.CommonMethod import *
+
+host = 'http://122.152.228.70:8080/vehicle/interface/login/anon/captcha'
+
+r = requests.get(host)
+print(r.text.encode('utf-8'))
 
 
-ip_port = ('103.46.128.43', 33409)
-sk = socket.socket()
-sk.connect(ip_port)
-
-while True:
-    sk.send(b'\xab\xcd')
+with open('test.jpg', 'wb') as f:
+    f.write(r.text.encode('utf-8'))
