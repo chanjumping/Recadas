@@ -250,7 +250,6 @@ class SuFuncWindow():
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
-
     #构造报文
     def send_msg(self):
         self.msg = self.frame_msg.get()

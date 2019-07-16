@@ -29,7 +29,7 @@ def upgrade_su(filename_, fragment_):
         file_size = len(file_content)
         upgrade_check_code_dec = sum(file_content)
         if upgrade_check_code_dec > 0xFFFFFFFF:
-            upgrade_check_code_dec -= 0xFFFFFFFF
+            upgrade_check_code_dec = upgrade_check_code_dec & 0xFFFFFFFF
         upgrade_check_code = num2big(upgrade_check_code_dec, 4)
         if file_size % fragment:
             total_pkg = int(file_size/fragment) + 2

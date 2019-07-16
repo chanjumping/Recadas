@@ -5,14 +5,14 @@ import os
 from Util.Log import logger
 from ServerModel.TCPRequestHandler import TCPRequestHandler, TCPRequestHandlerForFile, ThreadedTCPServer
 import threading
-from Util.Gui import loop
+# from Util.Gui import loop
 from Util.ReadConfig import conf
 from SaveModel.SaveMediaThread import SaveMediaThread
 from ParseModel.Consumer import ParseComm, Consumer
 from ParseModel.ParseGetMediaThread import GetMediaThread
 from Util.GlobalVar import query_msg_queue
 from ServerModel.WebServer import run_http_server
-# from Util.Gui_main import MainWindow
+from Util.Gui_Main import MainWindow
 
 
 path = os.path.realpath(__file__)
@@ -61,7 +61,7 @@ def main():
     get_media_thread.setDaemon(True)
     get_media_thread.start()
 
-    loop()
+    MainWindow()
 
     try:
         while True:

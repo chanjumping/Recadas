@@ -69,9 +69,15 @@ class GetMediaThread(threading.Thread):
             alarm_time = data[30:36]
             state = data[36:38]
             if peripheral == b'\x65':
+                logger.debug('')
+                logger.debug('========== 收到DSM告警信息 ==========')
+                logger.debug('')
                 log_event.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
                     byte2str(video_id), alarm_type_code_su_dsm.get(alarm_type)))
             elif peripheral == b'\x64':
+                logger.debug('')
+                logger.debug('========== 收到ADAS告警信息 ==========')
+                logger.debug('')
                 log_event.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
                     byte2str(video_id), alarm_type_code_su_adas.get(alarm_type)))
             log_event.debug('—————— 速度 {} 高程 {} 纬度 {} 经度 {} 告警时间 {} 车辆状态 {} ——————'.format(
