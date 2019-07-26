@@ -18,6 +18,8 @@ upgrade_check_code = ''
 file_content = b''
 task_id = 1
 
+active_upgrade = False
+
 
 # 升级苏标接口
 def upgrade_su(filename_, fragment_):
@@ -108,13 +110,11 @@ def parse_upgrade_su(data):
 
 
 # 升级JT808接口
-def upgrade_jt808(filename_, flag_, upgrade_type_, hw_, fw_, sw_, url_):
-    global active_upgrade
-    active_upgrade = 1
+def upgrade_jt808(filename_, flag_, upgrade_type_, hw_, fw_, sw_, url_, active_upgrade_):
     body = '8FA0' + '0000' + DEVICEID + num2big(get_serial_no())
     data = '7E' + body + calc_check_code(body) + '7E'
     send_queue.put(data)
-    global filename, flag, upgrade_type, hw, fw, sw, url
+    global filename, flag, upgrade_type, hw, fw, sw, url, active_upgrade
     filename = filename_
     flag = flag_
     upgrade_type = upgrade_type_
@@ -122,21 +122,31 @@ def upgrade_jt808(filename_, flag_, upgrade_type_, hw_, fw_, sw_, url_):
     fw = fw_
     sw = sw_
     url = url_
-
-
-active_upgrade = 0
+    active_upgrade = active_upgrade_
 
 
 # 解析JT808升级请求
-def parse_upgrade_request(data):
-    hw = data[58:90]
-    fw = data[91:123]
-    sw = data[124:156]
-    logger.debug('—————— 硬件版本号 {} ——————'.format(hw.decode('utf-8')))
-    logger.debug('—————— 固件版本号 {} ——————'.format(fw.decode('utf-8')))
-    logger.debug('—————— 软件版本号 {} ——————'.format(sw.decode('utf-8')))
+def parse_upgrade_request_jt808(data):
+    terminal_type = byte2str(data[13:15])
+    manufacture_id = byte2str(data[15:20])
+    terminal_model = byte2str(data[20:40])
+    terminal_id = byte2str(data[40:47])
+    terminal_SIM = byte2str(data[47:57])
+    hardware = data[58:90].decode('utf-8')
+    firmware = data[91:123].decode('utf-8')
+    software = data[124:156].decode('utf-8')
+    logger.debug('———————————————— 终端请求升级 ————————————————')
+    logger.debug('终端类型 {}'.format(terminal_type))
+    logger.debug('制造商ID {}'.format(manufacture_id))
+    logger.debug('终端型号 {}'.format(terminal_model))
+    logger.debug('终端ID {}'.format(terminal_id))
+    logger.debug('终端SIM卡 {}'.format(terminal_SIM))
+    logger.debug('硬件版本 {}'.format(hardware))
+    logger.debug('固件版本 {}'.format(firmware))
+    logger.debug('软件版本 {}'.format(software))
+    logger.debug('———————————————— END ————————————————')
+    global active_upgrade
     if active_upgrade:
-        global package_len
         with open(filename, 'rb') as f:
             package_len = len(f.read())
         msg_body = num2big(flag, 1) + num2big(upgrade_type, 1) + num2big(package_len, 4) + get_md5(filename) \
@@ -148,7 +158,7 @@ def parse_upgrade_request(data):
 
 
 # 解析JT808升级结果
-def parse_upgrade_result(data):
+def parse_upgrade_result_jt808(data):
     result = data[14:15]
     if result == b'\x00':
         logger.debug('—————— 升级成功 ——————')

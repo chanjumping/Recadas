@@ -3,7 +3,7 @@
 
 from ParseModel.Parse_JT808 import *
 from ParseModel.Parse_SU import *
-from ParseModel.Parse_SU_DEV import *
+from ParseModel.Parse_SU_TER import *
 from ParseModel.Parse_SF import *
 
 
@@ -99,25 +99,25 @@ parse_type_jt808 = {
     b'\x01\x08': lambda x: parse_upgrade_result_jt808(x),
     b'\x00\x01': lambda x: parse_device_comm_reply_jt808(x),
     b'\x8f\x03': lambda x: parse_route_id_jt808(x),
-    b'\x0f\xa1': lambda x: parse_query_upgrade_jt808(x),
+    b'\x0f\xa1': lambda x: parse_upgrade_request_jt808(x),
     b'\x8B\x01': lambda x: parse_driver_manage_jt808(x),
     b'\x08\x05': lambda x: parse_take_picture_jt808(x),
 }
-parse_type_su_dev = {
-    LOCATION_UPLOAD: lambda x: parse_location_upload_su_dev(x),
-    HEART_BEAT: lambda x: parse_heart_su_dev(x),
-    AUTHENTICATION: lambda x: parse_authentication_su_dev(x),
-    REGISTER: lambda x: parse_register_su_dev(x),
-    b'\x12\x10': lambda x: parse_alarm_attachment_msg_su_dev(x),
-    b'\x12\x11': lambda x: parse_media_msg_upload_su_dev(x),
-    b'\x12\x12': lambda x: parse_media_upload_finish_su_dev(x),
+parse_type_su_ter = {
+    LOCATION_UPLOAD: lambda x: parse_location_upload_su_ter(x),
+    HEART_BEAT: lambda x: parse_heart_su_ter(x),
+    AUTHENTICATION: lambda x: parse_authentication_su_ter(x),
+    REGISTER: lambda x: parse_register_su_ter(x),
+    b'\x12\x10': lambda x: parse_alarm_attachment_msg_su_ter(x),
+    b'\x12\x11': lambda x: parse_media_msg_upload_su_ter(x),
+    b'\x12\x12': lambda x: parse_media_upload_finish_su_ter(x),
 
-    b'\x01\x07': lambda x: parse_query_pro_su_dev(x),
-    b'\x09\x00': lambda x: parse_upload_msg_su_dev(x),
-    b'\x01\x04': lambda x: parse_query_para_su_dev(x),
-    b'\x01\x08': lambda x: parse_upgrade_result_su_dev(x),
-    b'\x08\x05': lambda x: parse_take_picture_su_dev(x),
-    b'\x00\x01': lambda x: parse_device_comm_reply_su_dev(x),
+    b'\x01\x07': lambda x: parse_query_pro_su_ter(x),
+    b'\x09\x00': lambda x: parse_upload_msg_su_ter(x),
+    b'\x01\x04': lambda x: parse_query_para_su_ter(x),
+    b'\x01\x08': lambda x: parse_upgrade_result_su_ter(x),
+    b'\x08\x05': lambda x: parse_take_picture_su_ter(x),
+    b'\x00\x01': lambda x: parse_device_comm_reply_su_ter(x),
 
 }
 
@@ -167,7 +167,7 @@ class ParseComm(threading.Thread):
                     if func:
                         func(data)
                 elif conf.get_protocol_type() == 5:
-                    func = parse_type_su_dev.get(command)
+                    func = parse_type_su_ter.get(command)
                     if func:
                         func(data)
             time.sleep(0.001)

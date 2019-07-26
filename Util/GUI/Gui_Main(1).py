@@ -2,7 +2,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 from Util.Gui_Su import *
-from Util.Gui_SuDev import *
+from Util.Gui_SuTer import *
 from Util.Gui_SF import *
 from Util.Gui_JT808 import *
 
@@ -95,8 +95,8 @@ class MainWindow():
         list = [self.frame_dev_upgrade,self.frame_dev_msg,self.frame_dev_info,self.frame_dev_para,
                 self.frame_dev_tts,self.frame_dev_file]
         self.grid_conf(list)
-        DevFuncWindow(self.frame_dev_upgrade,self.frame_dev_msg,self.frame_dev_info,self.frame_dev_para,
-                      self.frame_dev_tts,self.frame_dev_file,self.mainwindow)
+        SuTerFuncWindow(self.frame_dev_upgrade, self.frame_dev_msg, self.frame_dev_info, self.frame_dev_para,
+                        self.frame_dev_tts, self.frame_dev_file, self.mainwindow)
 
     #顺丰
     def shunfeng(self):

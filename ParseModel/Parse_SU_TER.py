@@ -10,12 +10,15 @@ comm_type = {
     b'\x81\x03': '设置终端参数',
     b'\x81\x00': '下发TTS语音',
     b'\x92\x08': '下发服务器地址',
-    b'\x92\x11': '新增0x9211'
+    b'\x92\x11': '新增0x9211',
+    b'\x81\x06': '查询参数',
+    b'\x8F\x01': '重启设备',
+    b'\x8F\xA0': '平台主动升级'
 }
 
 
 # 通用应答
-def comm_reply_su_dev(data, reply_result):
+def comm_reply_su_ter(data, reply_result):
     msg_id = data[1:3]
     serial_num = data[11:13]
     result = reply_result
@@ -25,7 +28,7 @@ def comm_reply_su_dev(data, reply_result):
 
 
 # 解析苏标终端通用应答
-def parse_device_comm_reply_su_dev(data):
+def parse_device_comm_reply_su_ter(data):
     comm = data[15:17]
     serial_no = byte2str(data[13:15])
     result = byte2str(data[17:18])
@@ -34,7 +37,7 @@ def parse_device_comm_reply_su_dev(data):
 
 
 # 解析位置上报
-def parse_location_upload_su_dev(data):
+def parse_location_upload_su_ter(data):
     state = byte2str(data[17:21])
     if 0x00000002 & big2num(state) == 0:
         gps_state = '定位失败'
@@ -62,7 +65,7 @@ def parse_location_upload_su_dev(data):
             state_flag = byte2str(data[47:48])
             event_type = data[48:49]
             if peripheral == b'\x64':
-                alarm_type = alarm_type_code_su_dev_adas.get(event_type)
+                alarm_type = alarm_type_code_su_ter_adas.get(event_type)
                 alarm_level = byte2str(data[49:50])
                 front_car_speed = byte2str(data[50:51])
                 front_distance = byte2str(data[51:52])
@@ -83,7 +86,7 @@ def parse_location_upload_su_dev(data):
                 log_event.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.format(speed, height, latitude, longitude,
                                                                                      alarm_time, car_state, alarm_flag))
             elif peripheral == b'\x65':
-                alarm_type = alarm_type_code_su_dev_dsm.get(event_type)
+                alarm_type = alarm_type_code_su_ter_dsm.get(event_type)
                 alarm_level = byte2str(data[49:50])
                 fatigue_level = byte2str(data[50:51])
                 retain = byte2str(data[51:55])
@@ -101,7 +104,7 @@ def parse_location_upload_su_dev(data):
                                                                                      alarm_time, car_state, alarm_flag))
 
             elif peripheral == b'\x67':
-                alarm_type = alarm_type_code_su_dev_bsd.get(event_type)
+                alarm_type = alarm_type_code_su_ter_bsd.get(event_type)
                 speed = big2num(byte2str(data[49:50]))
                 height = byte2str(data[50:52])
                 latitude = big2num(byte2str(data[52:56]))
@@ -115,30 +118,30 @@ def parse_location_upload_su_dev(data):
                                 format(speed, height, latitude, longitude, alarm_time, car_state, alarm_flag))
 
             logger.debug('')
-            send_server_command_su_dev(alarm_flag)
+            send_server_command_su_ter(alarm_flag)
 
-    reply_data = comm_reply_su_dev(data, '00')
+    reply_data = comm_reply_su_ter(data, '00')
     send_queue.put(reply_data)
 
 
 # 解析心跳
-def parse_heart_su_dev(data):
+def parse_heart_su_ter(data):
     logger.debug('—————— Heart Beat ——————')
-    data = comm_reply_su_dev(data, '00')
+    data = comm_reply_su_ter(data, '00')
     send_queue.put(data)
 
 
 # 鉴权
-def parse_authentication_su_dev(data):
+def parse_authentication_su_ter(data):
     authentication_code = data[13:-2]
     logger.debug('—————— 收到鉴权请求 ——————')
     logger.debug('鉴权码 {}'.format(authentication_code.decode('utf-8')))
-    reply_data = comm_reply_su_dev(data, '00')
+    reply_data = comm_reply_su_ter(data, '00')
     send_queue.put(reply_data)
 
 
 # 注册
-def parse_register_su_dev(data):
+def parse_register_su_ter(data):
     logger.debug('—————— 收到注册请求 ——————')
     serial_num = data[11:13]
     state = '00'
@@ -152,7 +155,7 @@ def parse_register_su_dev(data):
 
 
 # 苏标终端下发服务器命令
-def send_server_command_su_dev(alarm_flag):
+def send_server_command_su_ter(alarm_flag):
     logger.debug('—————— 下发服务器地址 ——————')
     server = conf.get_file_address()
     port = conf.get_file_port()
@@ -170,7 +173,7 @@ def send_server_command_su_dev(alarm_flag):
 
 
 # 苏标终端告警附件信息
-def parse_alarm_attachment_msg_su_dev(data):
+def parse_alarm_attachment_msg_su_ter(data):
     terminal_id = data[13:20].decode('utf-8')
     alarm_flag = byte2str(data[20:36])
     alarm_num = byte2str(data[36:68])
@@ -193,12 +196,12 @@ def parse_alarm_attachment_msg_su_dev(data):
         attachment_data = attachment_data[1+name_len+4:]
 
     logger.debug('—————— END ——————')
-    reply_data = comm_reply_su_dev(data, '00')
+    reply_data = comm_reply_su_ter(data, '00')
     send_queue.put(reply_data)
 
 
 # 苏标终端文件信息上传
-def parse_media_msg_upload_su_dev(data):
+def parse_media_msg_upload_su_ter(data):
     name_len = data[13:14]
     media_name = data[14:14 + big2num(byte2str(name_len))].split(b'\x00')[0].decode('utf-8')
     media_type = byte2str(data[-7:-6])
@@ -212,12 +215,12 @@ def parse_media_msg_upload_su_dev(data):
     logger.debug('文件大小 {}'.format(media_size))
     logger.debug('—————— END ——————')
 
-    reply_data = comm_reply_su_dev(data, '00')
+    reply_data = comm_reply_su_ter(data, '00')
     send_queue.put(reply_data)
 
 
 # 苏标终端告警上传结束标识
-def parse_media_upload_finish_su_dev(data):
+def parse_media_upload_finish_su_ter(data):
     loss_pkg_list = []
     name_len = data[13:14]
     media_name = data[14:14 + big2num(byte2str(name_len))].split(b'\x00')[0].decode('utf-8')
@@ -267,7 +270,7 @@ def parse_media_upload_finish_su_dev(data):
 
 
 # 解析请求终端属性
-def parse_query_pro_su_dev(data):
+def parse_query_pro_su_ter(data):
     terminal_type = byte2str(data[13:15])
     manufacture_id = byte2str(data[15:20])
     terminal_model = byte2str(data[20:40])
@@ -308,7 +311,7 @@ def send_upgrade_command(filename, flag, upgrade_type, hw, fw, sw, url):
 
 
 # 解析上传基本信息
-def parse_upload_msg_su_dev(data):
+def parse_upload_msg_su_ter(data):
     logger.debug('———————————————— START ————————————————')
     msg_type = data[13:14]
     if msg_type == b'\xf7':
@@ -361,7 +364,7 @@ def parse_upload_msg_su_dev(data):
 
 
 # 解析查询参数指令
-def parse_query_para_su_dev(data):
+def parse_query_para_su_ter(data):
     logger.debug('———————————————— START ————————————————')
     reply_serial_no = byte2str(data[13:15])
     logger.debug('应答流水号 {}'.format(reply_serial_no))
@@ -549,13 +552,13 @@ def parse_query_para_su_dev(data):
         logger.debug('———————————————— END ————————————————')
 
 
-def parse_upgrade_result_su_dev(data):
+def parse_upgrade_result_su_ter(data):
     upgrade_type = byte2str(data[13:14])
     upgrade_result = byte2str(data[14:15])
     logger.debug('—————— 终端升级结果: 升级类型 {} 升级结果 ——————'.format(upgrade_type, upgrade_result))
 
 
-def parse_take_picture_su_dev(data):
+def parse_take_picture_su_ter(data):
     reply_serial_no = byte2str(data[13:15])
     result = byte2str(data[15:16])
     media_num = byte2str(data[16:18])

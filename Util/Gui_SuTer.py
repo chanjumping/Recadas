@@ -3,10 +3,12 @@ from tkinter import Radiobutton
 from Util.GlobalVar import *
 from Util.CommonMethod import *
 import Util.GlobalVar as GlobalVar
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
+from Util.GetTestData import GetTestData
 
-class DevFuncWindow():
-    def __init__(self,upgrade,msg,info,para,tts,file,mainwindow):
+
+class SuTerFuncWindow():
+    def __init__(self, upgrade, msg, info, para, tts, file, parameter, mainwindow):
         self.frame_dev_upgrade = upgrade
         self.frame_dev_msg = msg
         self.frame_dev_info = info
@@ -14,6 +16,7 @@ class DevFuncWindow():
         self.frame_dev_tts = tts
         # self.frame_dev_photo = photo
         self.frame_dev_file = file
+        self.frame_parameter = parameter
         self.mainwindow = mainwindow
         self.serial_num = "0000"
         self.agreement_sign = "7E"
@@ -22,8 +25,8 @@ class DevFuncWindow():
     def dev_FuncWindow(self):
         self.frame_upgrade_path = StringVar()
         self.frame_msg = StringVar()
-        self.frame_trans = StringVar()
-        self.frame_devid = StringVar()
+        # self.frame_trans = StringVar()
+        # self.frame_devid = StringVar()
         self.frame_ip = StringVar()
         self.frame_port = StringVar()
         self.frame_tts = StringVar()
@@ -31,7 +34,7 @@ class DevFuncWindow():
         self.frame_size = StringVar()
         self.frame_name = StringVar()
         self.frame_flag = StringVar()
-        #升级操作
+        # 升级操作
         self.frame_dev_upgrade_direct = Label(self.frame_dev_upgrade,text="升级包地址：")
         self.frame_dev_upgrade_direct.grid(row=0,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_dev_upgrade_path = Entry(self.frame_dev_upgrade,textvariable=self.frame_upgrade_path,bd=5,width=18)
@@ -40,7 +43,7 @@ class DevFuncWindow():
         self.frame_dev_upgrade_example.grid(row=1,column=0,columnspan=2,ipadx=20,sticky=E)
         self.frame_dev_upgrade_exe = Button(self.frame_dev_upgrade,text="开始升级",command=self.start_upgrade,bd=5)
         self.frame_dev_upgrade_exe.grid(row=2,column=1,ipadx=20,ipady=5,pady=5,padx=20,sticky=W)
-        #构造报文
+        # 构造报文
         self.frame_dev_msg_text = Label(self.frame_dev_msg, text="构造的报文：")
         self.frame_dev_msg_text.grid(row=0, column=0, ipadx=20, ipady=5,padx=5, pady=5, sticky=W)
         self.frame_dev_msg_cont = Entry(self.frame_dev_msg, textvariable=self.frame_msg,bd=5,width=17)
@@ -49,26 +52,30 @@ class DevFuncWindow():
         self.frame_dev_msg_example.grid(row=1,column=1,ipadx=20,padx=5,sticky=W)
         self.frame_dev_msg_exe = Button(self.frame_dev_msg, text="发   送", command=self.send_msg, bd=5)
         self.frame_dev_msg_exe.grid(row=2, column=1, ipadx=20, ipady=5, pady=5,padx=20, sticky=W)
-        #基本信息查询
+        # 基本信息查询
         self.frame_dev_info_trans = Label(self.frame_dev_info,text="透传类型：",width=10)
         self.frame_dev_info_trans.grid(row=0, column=0, ipadx=10, ipady=5, pady=5, sticky=W)
-        self.frame_dev_info_f7 = Radiobutton(self.frame_dev_info,text="状态",variable=self.frame_trans,value="F7",indicatoron=0,bd=4)
-        self.frame_dev_info_f7.grid(row=0,column=1,columnspan=2,padx=20,pady=2,ipady=5,sticky=W)
-        self.frame_dev_info_f8 = Radiobutton(self.frame_dev_info,text="信息",variable=self.frame_trans,value="F8",indicatoron=0,bd=4)
-        self.frame_dev_info_f8.grid(row=0,column=3,columnspan=2,padx=20,pady=2,ipady=5,sticky=W)
+
+        girls1 = [("状态", 1), ('信息', 2)]
+        self.frame_trans = IntVar()
+        self.frame_trans.set(1)
+        for girl, num in girls1:
+            Radiobutton(self.frame_dev_info, text=girl, variable=self.frame_trans, value=num,
+                        indicatoron=0, bd=4).grid(row=0, column=num, columnspan=2,padx=20,pady=2,ipady=5,sticky=W)
+
         self.frame_dev_info_id = Label(self.frame_dev_info,text="外设ID：",width=10)
         self.frame_dev_info_id.grid(row=1, column=0, ipadx=5, ipady=5, pady=5, sticky=W)
-        self.frame_dev_info_64 = Radiobutton(self.frame_dev_info,text="ADAS",variable=self.frame_devid,value="64",bd=4)
-        self.frame_dev_info_64.grid(row=1,column=1,pady=5,ipady=5, sticky=W)
-        self.frame_dev_info_65 = Radiobutton(self.frame_dev_info,text="DSM",variable=self.frame_devid,value="65",bd=4)
-        self.frame_dev_info_65.grid(row=1,column=2,pady=5,ipady=5,sticky=W)
-        self.frame_dev_info_66 = Radiobutton(self.frame_dev_info,text="TPMS",variable=self.frame_devid,value="66",bd=4)
-        self.frame_dev_info_66.grid(row=1,column=3,pady=5,ipady=5,sticky=W)
-        self.frame_dev_info_67 = Radiobutton(self.frame_dev_info,text="BSD",variable=self.frame_devid,value="67",bd=4)
-        self.frame_dev_info_67.grid(row=1,column=4,pady=5,ipady=5,sticky=W)
+
+        girls1 = [("DSM", 1), ('ADAS', 2), ('BSD', 3)]
+        self.frame_devid = IntVar()
+        self.frame_devid.set(1)
+        for girl, num in girls1:
+            Radiobutton(self.frame_dev_info, text=girl, variable=self.frame_devid, value=num).grid(row=1, column=num,
+                                                                                ipadx=7, ipady=5, pady=6, sticky=W)
+
         self.frame_dev_info_query = Button(self.frame_dev_info,text="查    询",command=self.query_info,bd=5)
         self.frame_dev_info_query.grid(row=2, column=1,columnspan=4, ipadx=20, ipady=5, pady=5,padx=50, sticky=W)
-        #设置参数
+        # 设置参数
         self.frame_dev_para_ip = Label(self.frame_dev_para,text="IP地址：",width=10)
         self.frame_dev_para_ip.grid(row=0, column=0, ipadx=20, ipady=5,padx=5, pady=5, sticky=W)
         self.frame_dev_para_ipcont = Entry(self.frame_dev_para,textvariable=self.frame_ip,bd=5,width=17)
@@ -81,7 +88,7 @@ class DevFuncWindow():
         self.frame_dev_para_query.grid(row=2, column=0, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
         self.frame_dev_para_exe = Button(self.frame_dev_para,text="设   置",command=self.send_msg,bd=5)
         self.frame_dev_para_exe.grid(row=2, column=1, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
-        #tts语音
+        # tts语音
         self.frame_dev_tts_flag = Label(self.frame_dev_tts,text="TTS标记：",width=10)
         self.frame_dev_tts_flag.grid(row=0, column=0, ipadx=20, ipady=5,padx=5, pady=5, sticky=W)
         self.frame_dev_tts_flagcont = Entry(self.frame_dev_tts,textvariable=self.frame_flag,width=18,bd=5)
@@ -92,16 +99,53 @@ class DevFuncWindow():
         self.frame_dev_tts_voicecont.grid(row=1, column=1, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
         self.frame_dev_tts_exe = Button(self.frame_dev_tts,text="播    报",command=self.broadcast_vioce,bd=5)
         self.frame_dev_tts_exe.grid(row=2, column=1, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
-        #立即拍照
+        # 立即拍照
         # self.frame_dev_photo_title = Label(self.frame_dev_photo,text="通道ID：",width=10)
         # self.frame_dev_photo_title.grid(row=0, column=0, ipadx=20, ipady=5,padx=5, pady=5, sticky=W)
         # self.frame_dev_photo_type = Entry(self.frame_dev_photo,textvariable=self.frame_pass,width=17,bd=5)
         # self.frame_dev_photo_type.grid(row=0, column=1, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
         # self.frame_dev_photo_exe = Button(self.frame_dev_photo,text="立即抓拍",command=self.take_photo,bd=5)
         # self.frame_dev_photo_exe.grid(row=1, column=1, ipadx=20, ipady=5,padx=20, pady=5, sticky=W)
-        #远程查询告警附件
+        # 远程查询告警附件
         self.frame_dev_remote = Button(self.frame_dev_file,text="【点击】远程查询",command=self.window_remote,width=18,bd=5)
         self.frame_dev_remote.grid(row=0,column=0,ipadx=10, ipady=5,padx=90, pady=30, sticky=W)
+
+        # 参数操作
+        self.frame_su_para_case = Label(self.frame_parameter,text="用例：")
+        self.frame_su_para_case.grid(row=0,column=0,pady=15,sticky=W)
+        self.frame_su_para_select = Button(self.frame_parameter,text="选择用例",command=self.select_case_file,bd=5,width=15)
+        self.frame_su_para_select.grid(row=1,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
+        self.frame_su_para_exe = Button(self.frame_parameter,text="执行用例",command=self.case_exe,bd=5,width=15)
+        self.frame_su_para_exe.grid(row=1,column=1,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
+        self.frame_su_para_ADAS = Button(self.frame_parameter,text="查询ADAS参数",command=self.adas_para_query,bd=5,width=15)
+        self.frame_su_para_ADAS.grid(row=2,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
+        self.frame_su_para_DSM = Button(self.frame_parameter,text="查询DSM参数",command=self.dsm_para_query,bd=5,width=15)
+        self.frame_su_para_DSM.grid(row=2,column=1,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
+
+    # 查询ADAS参数
+    def adas_para_query(self):
+        send_queue.put('7E 81 06 00 05 00 02 18 21 00 08 00 24 01 00 00 F3 64 03 7E')
+
+    # 查询DSM参数
+    def dsm_para_query(self):
+        send_queue.put('7E 81 06 00 05 00 02 18 21 00 08 00 29 01 00 00 F3 65 0F 7E')
+
+    # 选择用例文件
+    def select_case_file(self):
+        self.casefile = filedialog.askopenfilename()
+        self.casefilename = os.path.split(self.casefile)[-1]
+        if self.casefilename:
+            self.frame_su_para_case.config(text="用例：" + self.casefilename)
+        else:
+            self.frame_su_para_case.config(text="未选择任何用例")
+
+    # 执行用例文件
+    def case_exe(self):
+        case = GetTestData(self.casefile)
+        case.open()
+        test_point, data = case.get_excel_data()
+        logger.debug('—————— ' + test_point + ' ——————')
+        send_queue.put(data)
 
 
     # ftp://test:123456@121.40.90.148/RW_CA_V410R004B001-1-002_inc.zip;;
@@ -113,25 +157,35 @@ class DevFuncWindow():
         data = JT808_FLAG + body + calc_check_code(body) + JT808_FLAG
         send_queue.put(data)
 
-    #构造报文
+    # 构造报文
     def send_msg(self):
         self.msg = self.frame_msg.get()
         send_queue.put(self.msg)
 
-    #查询信息
+    # 查询信息
     def query_info(self):
         self.trans = self.frame_trans.get()
+        if self.trans == 1:
+            self.trans = 'F7'
+        elif self.trans == 2:
+            self.trans = 'F8'
         self.id = self.frame_devid.get()
+        if self.id == 1:
+            self.id = '65'
+        elif self.id == 2:
+            self.id = '64'
+        elif self.id == 3:
+            self.id = '67'
         msg_body = self.trans + "01" + self.id
         body = "8900" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + self.serial_num + msg_body
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
 
-    #查询参数
+    # 查询参数
     def query_para(self):
         pass
 
-    #设置参数
+    # 设置参数
     def set_para(self):
         self.ip = self.frame_ip.get()
         self.port = self.frame_port.get()
@@ -149,7 +203,7 @@ class DevFuncWindow():
             data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
             send_queue.put(data)
 
-    #TTS语音
+    # TTS语音
     def broadcast_vioce(self):
         self.flag = self.frame_flag.get()
         self.tts = self.frame_tts.get()
@@ -164,11 +218,11 @@ class DevFuncWindow():
             data = '7E' + body + calc_check_code(body) + '7E'
             send_queue.put(data)
 
-    #立即拍照
+    # 立即拍照
     def take_photo(self):
         pass
 
-    #远程查看告警附件
+    # 远程查看告警附件
     def query_file(self):
         self.ip = self.frame_ip.get()
         self.port = self.frame_port.get()

@@ -62,7 +62,7 @@ def main():
     get_media_thread.start()
 
     MainWindow()
-
+    # loop()
     try:
         while True:
             wake_event.wait()

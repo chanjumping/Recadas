@@ -9,6 +9,8 @@ from Util.CommonMethod import *
 comm_type = {
     b'\x81\x03': '设置终端参数',
     b'\x81\x00': '下发TTS语音',
+    b'\x8F\x01': '重启设备',
+    b'\x8F\xA0': '平台主动升级'
 }
 
 
@@ -98,8 +100,8 @@ def parse_query_pro_jt808(data):
     firmware = data[59 + hardware_len:59 + hardware_len + firmware_len].decode('utf-8')
     gnss_model = byte2str(data[59 + hardware_len + firmware_len:60 + hardware_len + firmware_len])
     communication_model = byte2str(data[60 + hardware_len + firmware_len:61 + hardware_len + firmware_len])
-    # software_len = big2num(byte2str(data[61 + hardware_len + firmware_len:62 + hardware_len + firmware_len]))
-    # software = data[62 + hardware_len + firmware_len:62 + hardware_len + firmware_len + software_len].decode('utf-8')
+    software_len = big2num(byte2str(data[61 + hardware_len + firmware_len:62 + hardware_len + firmware_len]))
+    software = data[62 + hardware_len + firmware_len:62 + hardware_len + firmware_len + software_len].decode('utf-8')
     logger.debug('———————————————— 查询终端属性应答 ————————————————')
     logger.debug('终端类型 {}'.format(terminal_type))
     logger.debug('制造商ID {}'.format(manufacture_id))
@@ -108,7 +110,7 @@ def parse_query_pro_jt808(data):
     logger.debug('终端SIM卡 {}'.format(terminal_SIM))
     logger.debug('硬件版本 {}'.format(hardware))
     logger.debug('固件版本 {}'.format(firmware))
-    # logger.debug('软件版本 {}'.format(software))
+    logger.debug('软件版本 {}'.format(software))
     logger.debug('GNSS模块属性 {}'.format(gnss_model))
     logger.debug('通信模块属性 {}'.format(communication_model))
     logger.debug('———————————————— END ————————————————')
@@ -166,25 +168,25 @@ def parse_route_id_jt808(data):
     logger.debug('———————————————— END ————————————————')
 
 
-def parse_query_upgrade_jt808(data):
-    terminal_type = byte2str(data[13:15])
-    manufacture_id = byte2str(data[15:20])
-    terminal_model = byte2str(data[20:40])
-    terminal_id = byte2str(data[40:47])
-    terminal_SIM = byte2str(data[47:57])
-    hardware = data[58:90].decode('utf-8')
-    firmware = data[91:123].decode('utf-8')
-    software = data[124:156].decode('utf-8')
-    logger.debug('———————————————— 终端请求升级 ————————————————')
-    logger.debug('终端类型 {}'.format(terminal_type))
-    logger.debug('制造商ID {}'.format(manufacture_id))
-    logger.debug('终端型号 {}'.format(terminal_model))
-    logger.debug('终端ID {}'.format(terminal_id))
-    logger.debug('终端SIM卡 {}'.format(terminal_SIM))
-    logger.debug('硬件版本 {}'.format(hardware))
-    logger.debug('固件版本 {}'.format(firmware))
-    logger.debug('软件版本 {}'.format(software))
-    logger.debug('———————————————— END ————————————————')
+# def parse_query_upgrade_jt808(data):
+#     terminal_type = byte2str(data[13:15])
+#     manufacture_id = byte2str(data[15:20])
+#     terminal_model = byte2str(data[20:40])
+#     terminal_id = byte2str(data[40:47])
+#     terminal_SIM = byte2str(data[47:57])
+#     hardware = data[58:90].decode('utf-8')
+#     firmware = data[91:123].decode('utf-8')
+#     software = data[124:156].decode('utf-8')
+#     logger.debug('———————————————— 终端请求升级 ————————————————')
+#     logger.debug('终端类型 {}'.format(terminal_type))
+#     logger.debug('制造商ID {}'.format(manufacture_id))
+#     logger.debug('终端型号 {}'.format(terminal_model))
+#     logger.debug('终端ID {}'.format(terminal_id))
+#     logger.debug('终端SIM卡 {}'.format(terminal_SIM))
+#     logger.debug('硬件版本 {}'.format(hardware))
+#     logger.debug('固件版本 {}'.format(firmware))
+#     logger.debug('软件版本 {}'.format(software))
+#     logger.debug('———————————————— END ————————————————')
 
     # start_test_thread = threading.Thread(target=start_test_jt808)
     # start_test_thread.setDaemon(True)
@@ -205,6 +207,7 @@ def parse_take_picture_jt808(data):
     logger.debug('———————————————— END ————————————————')
 
 
+# 解析司机身份管理
 def parse_driver_manage_jt808(data):
     reply_serial_no = byte2str(data[13:15])
     reply_id = byte2str(data[15:17])
@@ -216,6 +219,7 @@ def parse_driver_manage_jt808(data):
     logger.debug('———————————————— END ————————————————')
 
 
+# 测试用
 # 不断重启抓取DSM和ADAS图像
 def start_test_jt808():
     # time.sleep(30)

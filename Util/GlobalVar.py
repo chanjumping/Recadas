@@ -115,7 +115,7 @@ alarm_type_code_su_bsd = {
 
 
 # 苏标终端DSM对应的告警类型名称
-alarm_type_code_su_dev_dsm = {
+alarm_type_code_su_ter_dsm = {
     b'\x04': 'Distracted',
     b'\x05': 'Driver_Abnormal',
     b'\x01': 'Fatigue',
@@ -130,7 +130,7 @@ alarm_type_code_su_dev_dsm = {
 }
 
 # 苏标终端ADAS对应的告警类型名称
-alarm_type_code_su_dev_adas = {
+alarm_type_code_su_ter_adas = {
     b'\x01': 'Collision',
     b'\x02': 'Depart',
     b'\x03': 'Too_Close',
@@ -139,7 +139,7 @@ alarm_type_code_su_dev_adas = {
 }
 
 # 苏标终端BSD对应的告警类型名称
-alarm_type_code_su_dev_bsd = {
+alarm_type_code_su_ter_bsd = {
     b'\x01': '后方接近报警',
     b'\x02': '左侧后方接近报警',
     b'\x03': '右侧后方接近报警',
