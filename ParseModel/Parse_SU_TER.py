@@ -34,6 +34,9 @@ def parse_device_comm_reply_su_ter(data):
     result = byte2str(data[17:18])
     type_name = comm_type.get(comm)
     logger.debug('—————— 收到 {} 的通用应答 流水号 {} 应答结果 {} ——————'.format(type_name, serial_no, result))
+    if comm == b'\x92\x08':
+        if GlobalVar.send_address_dict.get(serial_no):
+            GlobalVar.send_address_dict.pop(serial_no)
 
 
 # 解析位置上报
@@ -59,7 +62,7 @@ def parse_location_upload_su_ter(data):
             logger.debug('========== 收到BSD告警信息 ==========')
         length = data[42:43]
         if not big2num(byte2str(length)) == len(data[43:-2]):
-            log_event.debug('告警事件中附加项长度与实际长度不一致 {}'.format(byte2str(data)))
+            logger.debug('告警事件中附加项长度与实际长度不一致 {}'.format(byte2str(data)))
         else:
             alarm_id = big2num(byte2str(data[43:47]))
             state_flag = byte2str(data[47:48])
@@ -79,11 +82,11 @@ def parse_location_upload_su_ter(data):
                 alarm_time = byte2str(data[66:72])
                 car_state = byte2str(data[72:74])
                 alarm_flag = byte2str(data[74:90])
-                log_event.debug('告警ID {} 标识状态 {} 报警级别 {} 前车速度 {} 前车/行人距离 {} 偏离类型 {} 道路识别类型 {} 道路识别数据 {} '
+                logger.debug('告警ID {} 标识状态 {} 报警级别 {} 前车速度 {} 前车/行人距离 {} 偏离类型 {} 道路识别类型 {} 道路识别数据 {} '
                                 '告警类型 - - - - - - - - - - - - - - - - - - - - - - - - 【 {} 】'.format(alarm_id, state_flag, alarm_level,
                                 front_car_speed, front_distance, departure_type, road_identify_type, road_identify_data, alarm_type))
 
-                log_event.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.format(speed, height, latitude, longitude,
+                logger.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.format(speed, height, latitude, longitude,
                                                                                      alarm_time, car_state, alarm_flag))
             elif peripheral == b'\x65':
                 alarm_type = alarm_type_code_su_ter_dsm.get(event_type)
@@ -97,10 +100,10 @@ def parse_location_upload_su_ter(data):
                 alarm_time = byte2str(data[66:72])
                 car_state = byte2str(data[72:74])
                 alarm_flag = byte2str(data[74:90])
-                log_event.debug('告警ID {} 标识状态 {} 报警级别 {} 疲劳级别 {} 预留 {} 告警类型 - - - - - - - - - - - - - - - - - - - - '
+                logger.debug('告警ID {} 标识状态 {} 报警级别 {} 疲劳级别 {} 预留 {} 告警类型 - - - - - - - - - - - - - - - - - - - - '
                                 '【 {} 】'.format(alarm_id, state_flag, alarm_level, fatigue_level, retain, alarm_type))
 
-                log_event.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.format(speed, height, latitude, longitude,
+                logger.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.format(speed, height, latitude, longitude,
                                                                                      alarm_time, car_state, alarm_flag))
 
             elif peripheral == b'\x67':
@@ -112,9 +115,9 @@ def parse_location_upload_su_ter(data):
                 alarm_time = byte2str(data[60:66])
                 car_state = byte2str(data[66:70])
                 alarm_flag = byte2str(data[70:86])
-                log_event.debug('告警ID {} 标识状态 {} 告警类型 - - - - - - - - - - - - - - - - - - - - 【 {} 】'.
+                logger.debug('告警ID {} 标识状态 {} 告警类型 - - - - - - - - - - - - - - - - - - - - 【 {} 】'.
                                 format(alarm_id, state_flag, alarm_type))
-                log_event.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.
+                logger.debug('车速 {} 高程 {} 纬度 {} 经度 {} 日期 {} 车辆状态 {} 报警标识号 {}'.
                                 format(speed, height, latitude, longitude, alarm_time, car_state, alarm_flag))
 
             logger.debug('')
@@ -164,44 +167,48 @@ def send_server_command_su_ter(alarm_flag):
         upload = '05'
     else:
         upload = '00'
-    msg_body = num2big(len(server), 1) + str2hex(server, len(server)) + num2big(port, 2) + '0000' + alarm_flag + \
-               str2hex(str(int(time.time()*1000000)), 16)*2 + control + upload + '00' * 14
-    body = '%s%s%s%s%s' % ('9208', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, num2big(
-        GlobalVar.get_serial_no()), msg_body)
+    alarm_num = str(int(time.time()*1000000))
+    logger.debug('下发报警编号为 {}'.format(alarm_num*2))
+    msg_body = num2big(len(server), 1) + str2hex(server, len(server)).upper() + num2big(port, 2) + '0000' + alarm_flag + \
+               str2hex(alarm_num, 16)*2 + control + upload + '00' * 14
+    serial_num = num2big(GlobalVar.get_serial_no())
+    body = '%s%s%s%s%s' % ('9208', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, serial_num, msg_body)
     data = '%s%s%s%s' % ('7E', body, calc_check_code(body), '7E')
+    GlobalVar.send_address_dict[serial_num] = data
     send_queue.put(data)
+    GlobalVar.send_address_time_out = 10
 
 
 # 苏标终端告警附件信息
-def parse_alarm_attachment_msg_su_ter(data):
-    terminal_id = data[13:20].decode('utf-8')
+def parse_alarm_attachment_msg_su_ter(data, rec_obj):
+    terminal_id = byte2str(data[13:20])
     alarm_flag = byte2str(data[20:36])
     alarm_num = byte2str(data[36:68])
     msg_type = byte2str(data[68:69])
     attachment_num = big2num(byte2str(data[69:70]))
-    logger.debug('—————— 报警附件信息 ——————')
-    logger.debug('终端ID {}'.format(terminal_id))
-    logger.debug('报警标识号 {}'.format(alarm_flag))
-    logger.debug('报警编号 {}'.format(alarm_num))
-    logger.debug('信息类型 {}'.format(msg_type))
-    logger.debug('附件数量 {}'.format(attachment_num))
+    log_event.debug('{} —————— 报警附件信息 ——————'.format(rec_obj.client_address))
+    log_event.debug('{} 终端ID {}'.format(rec_obj.client_address, terminal_id))
+    log_event.debug('{} 报警标识号 {}'.format(rec_obj.client_address, alarm_flag))
+    log_event.debug('{} 报警编号 {}'.format(rec_obj.client_address, alarm_num))
+    log_event.debug('{} 信息类型 {}'.format(rec_obj.client_address, msg_type))
+    log_event.debug('{} 附件数量 {}'.format(rec_obj.client_address, attachment_num))
     attachment_data = data[70:-2]
     while len(attachment_data):
         name_len = big2num(byte2str(attachment_data[0:1]))
-        logger.debug('文件名称长度 {}'.format(name_len))
+        log_event.debug('{} 文件名称长度 {}'.format(rec_obj.client_address, name_len))
         name = attachment_data[1:1+name_len].decode('utf-8')
-        logger.debug('文件名称 {}'.format(name))
+        log_event.debug('{} 文件名称 {}'.format(rec_obj.client_address, name))
         file_size = big2num(byte2str(attachment_data[1+name_len:1+name_len+4]))
-        logger.debug('文件大小 {}'.format(file_size))
+        log_event.debug('{} 文件大小 {}'.format(rec_obj.client_address, file_size))
         attachment_data = attachment_data[1+name_len+4:]
 
-    logger.debug('—————— END ——————')
+    log_event.debug('{} —————— END ——————'.format(rec_obj.client_address))
     reply_data = comm_reply_su_ter(data, '00')
-    send_queue.put(reply_data)
+    return reply_data
 
 
 # 苏标终端文件信息上传
-def parse_media_msg_upload_su_ter(data):
+def parse_media_msg_upload_su_ter(data, rec_obj):
     name_len = data[13:14]
     media_name = data[14:14 + big2num(byte2str(name_len))].split(b'\x00')[0].decode('utf-8')
     media_type = byte2str(data[-7:-6])
@@ -209,18 +216,18 @@ def parse_media_msg_upload_su_ter(data):
     name_size[media_name] = media_size
     quotient = media_size//65536
     name_offset_data[media_name] = dict(zip([x * 65536 for x in range(quotient + 1)], [None] * quotient))
-    logger.debug('—————— 文件信息上传 ——————')
-    logger.debug('文件名 {}'.format(media_name))
-    logger.debug('文件类型 {}'.format(media_type))
-    logger.debug('文件大小 {}'.format(media_size))
-    logger.debug('—————— END ——————')
+    log_event.debug('{} —————— 文件信息上传 ——————'.format(rec_obj.client_address))
+    log_event.debug('{} 文件名 {}'.format(rec_obj.client_address, media_name))
+    log_event.debug('{} 文件类型 {}'.format(rec_obj.client_address, media_type))
+    log_event.debug('{} 文件大小 {}'.format(rec_obj.client_address, media_size))
+    log_event.debug('{} —————— END ——————'.format(rec_obj.client_address))
 
     reply_data = comm_reply_su_ter(data, '00')
-    send_queue.put(reply_data)
+    return reply_data
 
 
 # 苏标终端告警上传结束标识
-def parse_media_upload_finish_su_ter(data):
+def parse_media_upload_finish_su_ter(data, rec_obj):
     loss_pkg_list = []
     name_len = data[13:14]
     media_name = data[14:14 + big2num(byte2str(name_len))].split(b'\x00')[0].decode('utf-8')
@@ -228,45 +235,48 @@ def parse_media_upload_finish_su_ter(data):
     media_size = big2num(byte2str(data[-6:-2]))
     quotient = media_size//65536
     remainder = media_size % 65536
-    logger.debug('—————— 告警结束 ——————')
-    logger.debug('文件名 {}'.format(media_name))
-    logger.debug('文件类型 {} '.format(media_type))
-    logger.debug('文件大小 {}'.format(media_size))
-    logger.debug('—————— END ——————')
+    log_event.debug('{} —————— 告警结束 ——————'.format(rec_obj.client_address))
+    log_event.debug('{} 文件名 {}'.format(rec_obj.client_address, media_name))
+    log_event.debug('{} 文件类型 {} '.format(rec_obj.client_address, media_type))
+    log_event.debug('{} 文件大小 {}'.format(rec_obj.client_address, media_size))
+    log_event.debug('{} —————— END ——————'.format(rec_obj.client_address))
 
     filename_length = data[13:14]
     file_name = data[14:14 + big2num(byte2str(filename_length))]
     file_type = data[-7:-6]
     offset_data = name_offset_data.get(media_name)
 
-    # if len(offset_data) > 1:
-    #     offset_data[0] = None
-    #     offset_data[65536] = None
-    for x in offset_data.keys():
-        if not offset_data.get(x):
-            loss_pkg_list.append(x)
-    if not loss_pkg_list:
-        msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '00' + '00'
-        for x in sorted(offset_data.keys()):
-            media_queue.put(offset_data.get(x))
-        name_offset_data.pop(media_name)
-    else:
-        loss_pkg = ''
-        loss_len = len(loss_pkg_list)
-        logger.info("{} 多媒体数据丢包，丢包偏移量为 {}".format(media_name, loss_pkg_list))
-        if quotient in loss_pkg_list:
-            loss_pkg_list.pop(quotient)
-            for x in loss_pkg_list:
-                loss_pkg += num2big(x, 4) + num2big(65536, 4)
-            loss_pkg += num2big(quotient, 4) + num2big(remainder, 4)
+    if offset_data:
+        # if len(offset_data) > 1:
+        #     offset_data[0] = None
+        #     offset_data[65536] = None
+        for x in offset_data.keys():
+            if not offset_data.get(x):
+                    loss_pkg_list.append(x)
+        if not loss_pkg_list:
+            msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '00' + '00'
+            for x in sorted(offset_data.keys()):
+                media_queue.put(offset_data.get(x))
+            name_offset_data.pop(media_name)
         else:
-            for x in loss_pkg_list:
-                loss_pkg += num2big(x, 4) + num2big(65536, 4)
-        msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '01' + num2big(loss_len, 1) + loss_pkg
+            loss_pkg = ''
+            loss_len = len(loss_pkg_list)
+            log_event.info("{} {} 多媒体数据丢包，丢包偏移量为 {}".format(rec_obj.client_address, media_name, loss_pkg_list))
+            if quotient in loss_pkg_list:
+                loss_pkg_list.pop(quotient)
+                for x in loss_pkg_list:
+                    loss_pkg += num2big(x, 4) + num2big(65536, 4)
+                loss_pkg += num2big(quotient, 4) + num2big(remainder, 4)
+            else:
+                for x in loss_pkg_list:
+                    loss_pkg += num2big(x, 4) + num2big(65536, 4)
+            msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '01' + num2big(loss_len, 1) + loss_pkg
+    else:
+        msg_body = byte2str(filename_length) + byte2str(file_name) + byte2str(file_type) + '00' + '00'
     body = '%s%s%s%s%s' % ('9212', num2big(int(len(msg_body) / 2)), GlobalVar.DEVICEID, num2big(
         GlobalVar.get_serial_no()), msg_body)
     data = '%s%s%s%s' % ('7E', body, calc_check_code(body), '7E')
-    send_queue.put(data)
+    return data
 
 
 # 解析请求终端属性

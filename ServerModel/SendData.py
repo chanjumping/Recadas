@@ -5,6 +5,8 @@ from Util.Log import logger
 import threading
 import time
 from ParseModel import ParseData
+from Util.GetTestData import send_queue
+import queue
 
 
 class SendData(threading.Thread):
@@ -17,7 +19,11 @@ class SendData(threading.Thread):
     def run(self):
         logger.debug(threading.current_thread().getName())
         while self.rec_obj.isAlive:
-            text = ParseData.send_queue_data()
+            try:
+                data = send_queue.get_nowait()
+            except queue.Empty:
+                data = None
+            text = ParseData.send_queue_data(data)
             if text:
                 try:
                     self.rec_obj.request.sendall(text)
@@ -27,6 +33,4 @@ class SendData(threading.Thread):
                     logger.debug('ConnectionResetError，connection is interrupted.')
                 except ConnectionAbortedError:
                     logger.debug('ConnectionAbortedError，connection is interrupted.')
-                except OSError:
-                    logger.debug('SEND DATA THREAD {}'.format(self.rec_obj.request))
             time.sleep(0.001)

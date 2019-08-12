@@ -2,12 +2,13 @@
 # coding=utf-8
 
 import socketserver
-from Util.Log import logger
+from Util.Log import logger, log_event
 import time
 import socket
 from Util.ReadConfig import conf
 from ParseModel import ParseData
 from ServerModel.SendData import SendData
+from ServerModel.DogThread import DogThread
 
 
 class TCPRequestHandler(socketserver.BaseRequestHandler):
@@ -19,7 +20,7 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
             self.timeOut = 25
         self.remain = b''
         self.isAlive = True
-        self.request.settimeout(self.timeOut)
+        # self.request.settimeout(self.timeOut)
 
     def handle(self):
         address, port = self.client_address
@@ -33,11 +34,15 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
         if conf.get_protocol_type() == 1:
             if conf.get_sync_flag():
                 from Util.Sync_SU import SyncThread
-                sync_thread = SyncThread('Sync Thread Start ...', self)
+                sync_thread = SyncThread('【 Data Server 】 Sync Thread Start ...', self)
                 sync_thread.setDaemon(True)
                 sync_thread.start()
             global fetch_media_flag
             fetch_media_flag = True
+        elif conf.get_protocol_type() == 5:
+            dog_thread = DogThread('【 Data Server 】 Dog Thread Start ...', self)
+            dog_thread.setDaemon(True)
+            dog_thread.start()
 
         while True:
             try:
@@ -58,6 +63,10 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
                     self.isAlive = False
                     time.sleep(0.3)
                     logger.debug('【 Data Server 】 ConnectionAbortedError，connection is interrupted.')
+                except Exception as e:
+                    logger.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    logger.error(e)
+
             except socket.timeout:
                 self.isAlive = False
                 time.sleep(0.3)
@@ -85,7 +94,7 @@ class TCPRequestHandlerForFile(socketserver.BaseRequestHandler):
         self.timeOut = 20
         self.remain = b''
         self.isAlive = True
-        self.request.settimeout(self.timeOut)
+        # self.request.settimeout(self.timeOut)
 
     def handle(self):
         address, port = self.client_address
@@ -100,31 +109,32 @@ class TCPRequestHandlerForFile(socketserver.BaseRequestHandler):
             try:
                 buf = b''
                 if self.remain:
-                    self.remain = ParseData.produce(buf, self.remain)
+                    self.remain = ParseData.produce_for_file(buf, self.remain, self)
                 try:
                     buf = self.request.recv(1024)
                 except TimeoutError:
-                    logger.debug('【 File Server 】 Receiving ack timeout，connection is interrupted.')
+                    log_event.debug('{} 【 File Server 】 Receiving ack timeout，connection is interrupted.'.format(self.client_address))
                 except ConnectionResetError:
-                    logger.debug('【 File Server 】 ConnectionResetError，connection is interrupted.')
+                    log_event.debug('{} 【 File Server 】 ConnectionResetError，connection is interrupted.'.format(self.client_address))
                 except ConnectionAbortedError:
-                    logger.debug('【 File Server 】 ConnectionAbortedError，connection is interrupted.')
+                    log_event.debug('{} 【 File Server 】 ConnectionAbortedError，connection is interrupted.'.format(self.client_address))
                 except Exception as e:
-                    logger.error(e)
+                    log_event.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                    log_event.error(e)
             except socket.timeout:
                 break
             if not buf:
                 self.isAlive = False
                 time.sleep(0.3)
-                logger.debug('【 File Server 】 Receive empty data，connection is interrupted.')
+                log_event.debug('{} 【 File Server 】 Receive empty data，connection is interrupted.'.format(self.client_address))
                 break
-            self.remain = ParseData.produce(buf, self.remain)
+            self.remain = ParseData.produce_for_file(buf, self.remain, self)
             time.sleep(0.001)
 
     def finish(self):
         address, port = self.client_address
-        logger.debug('【 File Server 】 Connection {} {} is disconnected.'.format(address, port))
-        logger.debug('-'*100)
+        log_event.debug('{} 【 File Server 】 Connection {} {} is disconnected.'.format(self.client_address, address, port))
+        log_event.debug('-'*100)
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

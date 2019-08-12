@@ -32,7 +32,7 @@ class GetMediaThread(threading.Thread):
         logger.debug(threading.current_thread().getName())
         while True:
             try:
-                data, command = rec_alarm_queue.get_nowait()
+                data, command, rec_obj = rec_alarm_queue.get_nowait()
             except queue.Empty:
                 data = None
             if data:
@@ -72,15 +72,15 @@ class GetMediaThread(threading.Thread):
                 logger.debug('')
                 logger.debug('========== 收到DSM告警信息 ==========')
                 logger.debug('')
-                log_event.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
+                logger.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
                     byte2str(video_id), alarm_type_code_su_dsm.get(alarm_type)))
             elif peripheral == b'\x64':
                 logger.debug('')
                 logger.debug('========== 收到ADAS告警信息 ==========')
                 logger.debug('')
-                log_event.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
+                logger.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
                     byte2str(video_id), alarm_type_code_su_adas.get(alarm_type)))
-            log_event.debug('—————— 速度 {} 高程 {} 纬度 {} 经度 {} 告警时间 {} 车辆状态 {} ——————'.format(
+            logger.debug('—————— 速度 {} 高程 {} 纬度 {} 经度 {} 告警时间 {} 车辆状态 {} ——————'.format(
                 big2num(byte2str(speed)),big2num(byte2str(height)), byte2str(latitude), byte2str(longitude),
                 byte2str(alarm_time), byte2str(state)))
             if conf.get_get_media_flag():
@@ -121,7 +121,7 @@ class GetMediaThread(threading.Thread):
         if byte2str(pkg_total) == '0000' and byte2str(pkg_num) == '0000':
             if byte2str(media_type) == '02':
                 logger.info('—————— 告警视频未录制完   {} ——————'.format(byte2str(data)))
-                query_media_body = '%s%s%s%s%s' % (COMPANY_NO, PERIPHERAL, '50',
+                query_media_body = '%s%s%s%s%s' % (COMPANY_NO, byte2str(peripheral), '50',
                                                    byte2str(media_type), byte2str(media_id))
                 query_media = '%s%s%s%s%s' % (SU_FLAG, calc_check_code(query_media_body),
                                               num2big(GlobalVar.get_serial_no()), query_media_body, SU_FLAG)
@@ -162,7 +162,7 @@ class GetMediaThread(threading.Thread):
             if pkg_no == 1:
                 GetMediaThread.current_media_id = big2num(byte2str(data[17:21]))
                 channel = big2num(byte2str(data[24:25]))
-                log_event.debug('——————正在获取ID为 {} 的多媒体数据 ——————'.format(GetMediaThread.current_media_id))
+                logger.debug('——————正在获取ID为 {} 的多媒体数据 ——————'.format(GetMediaThread.current_media_id))
                 if channel == 1:
                     channel = 'DSM'
                 elif channel == 2:
@@ -175,7 +175,7 @@ class GetMediaThread(threading.Thread):
                 longitude = byte2str(data[37:41])
                 speed = big2num(byte2str(data[43:45]))
                 alarm_time = byte2str(data[47:53])
-                log_event.debug('—————— 通道 {}，状态 {}，速度 {} km/h, 纬度 {}，经度 {}, 时间 {} ——————'.format(channel, state, speed/10, latitude,
+                logger.debug('—————— 通道 {}，状态 {}，速度 {} km/h, 纬度 {}，经度 {}, 时间 {} ——————'.format(channel, state, speed/10, latitude,
                                                                                     longitude, alarm_time))
                 # 如果当前告警ID不在已接收完成的多媒体列表（media_finish）中，则将该ID添加到进去，并且将值置为False
                 # 记录最后一个分片包对应的流水号和告警ID的键值对，存入last_pkg_media_id
@@ -196,7 +196,7 @@ class GetMediaThread(threading.Thread):
                     GetMediaThread.rec_pkg_list = list(GlobalVar.media_id_data.keys())
                     loss_pkg_list = [x for x in GlobalVar.pkg_list if x not in GetMediaThread.rec_pkg_list]
                     if not loss_pkg_list:
-                        log_event.debug('—————— 多媒体ID ' + str(GetMediaThread.current_media_id) + ' ---------- 接收数据完成 ——————')
+                        logger.debug('—————— 多媒体ID ' + str(GetMediaThread.current_media_id) + ' ---------- 接收数据完成 ——————')
                         msg_body = num2big(GetMediaThread.current_media_id, 4) + '00'
                         body = '%s%s%s%s%s' % ('8800', num2big(int(len(msg_body) / 2)),
                                                DEVICEID, num2big(GlobalVar.get_serial_no()),

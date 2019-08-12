@@ -109,12 +109,15 @@ class SaveMediaThread(threading.Thread):
                         media_size = name_size.get(media_name)
                         media_type = media_name.split('_')[2]
                         if media_type[:2] == '65':
-                            media_type = alarm_type_code_su_dev_dsm.get(bytes.fromhex(media_type[2:]))
+                            media_type = alarm_type_code_su_ter_dsm.get(bytes.fromhex(media_type[2:]))
                         elif media_type[:2] == '64':
-                            media_type = alarm_type_code_su_dev_adas.get(bytes.fromhex(media_type[2:]))
+                            media_type = alarm_type_code_su_ter_dsm.get(bytes.fromhex(media_type[2:]))
                         else:
                             media_type = 'error'
                         media_name = media_name.replace('.', '_{}.'.format(media_type))
+                        media_name_list = media_name.split('_')
+                        media_name = media_name_list[4] + '_' + '_'.join(media_name_list)
+                        # media_name = media_type + "_" + media_name
                         offset = big2num(byte2str(data[54:58]))
                         data_length = big2num(byte2str(data[58:62]))
                         data_content = data[62: 62 + data_length]

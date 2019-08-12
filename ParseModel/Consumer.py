@@ -108,9 +108,6 @@ parse_type_su_ter = {
     HEART_BEAT: lambda x: parse_heart_su_ter(x),
     AUTHENTICATION: lambda x: parse_authentication_su_ter(x),
     REGISTER: lambda x: parse_register_su_ter(x),
-    b'\x12\x10': lambda x: parse_alarm_attachment_msg_su_ter(x),
-    b'\x12\x11': lambda x: parse_media_msg_upload_su_ter(x),
-    b'\x12\x12': lambda x: parse_media_upload_finish_su_ter(x),
 
     b'\x01\x07': lambda x: parse_query_pro_su_ter(x),
     b'\x09\x00': lambda x: parse_upload_msg_su_ter(x),
@@ -119,6 +116,12 @@ parse_type_su_ter = {
     b'\x08\x05': lambda x: parse_take_picture_su_ter(x),
     b'\x00\x01': lambda x: parse_device_comm_reply_su_ter(x),
 
+}
+
+parse_type_su_ter_for_file = {
+    b'\x12\x10': lambda x, y: parse_alarm_attachment_msg_su_ter(x, y),
+    b'\x12\x11': lambda x, y: parse_media_msg_upload_su_ter(x, y),
+    b'\x12\x12': lambda x, y: parse_media_upload_finish_su_ter(x, y)
 }
 
 parse_type_sf = {

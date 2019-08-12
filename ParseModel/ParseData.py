@@ -4,6 +4,7 @@ from Util.CommonMethod import *
 from Util.GlobalVar import *
 from Util.ReadConfig import conf
 from Util.Log import log_event
+from ParseModel.Consumer import parse_type_su_ter_for_file
 
 
 def produce(buf, remain):
@@ -62,7 +63,7 @@ def produce(buf, remain):
             current = 0
         remain = data[current:]
         return remain
-    elif conf.get_protocol_type() == 3:
+    elif conf.get_protocol_type() == 3 or conf.get_protocol_type() == 5:
         data = remain + buf
         st_list = [m.start() for m in re.finditer(b"\x7e", data)]
         current = -1
@@ -106,52 +107,105 @@ def produce(buf, remain):
                     logger.error("未能解析的55数据" + byte2str(data_piece))
         remain = data[current + 1:]
         return remain
-    elif conf.get_protocol_type() == 5:
-        data = remain + buf
-        if data[0:1] == b'\x7e':
-            st_list = [m.start() for m in re.finditer(b"\x7e", data)]
-            if len(st_list) >= 2:
-                data_piece = data[:st_list[1] + 1]
-                data_piece = rec_translate(data_piece)
-                if byte2str(data_piece[-2:-1]) == calc_check_code(byte2str(data_piece[1:-2])):
-                    rec_queue.put(data_piece)
-                    remain = data[st_list[1]+1:]
-                else:
-                    logger.error('校验码错误。')
-                    logger.error(byte2str(data_piece))
+    # elif conf.get_protocol_type() == 5:
+    #     data = remain + buf
+    #     if data[0:1] == b'\x7e':
+    #         st_list = [m.start() for m in re.finditer(b"\x7e", data)]
+    #         if len(st_list) >= 2:
+    #             data_piece = data[:st_list[1] + 1]
+    #             data_piece = rec_translate(data_piece)
+    #             if byte2str(data_piece[-2:-1]) == calc_check_code(byte2str(data_piece[1:-2])):
+    #                 rec_queue.put(data_piece)
+    #                 remain = data[st_list[1]+1:]
+    #             else:
+    #                 logger.error('校验码错误。')
+    #                 logger.error(byte2str(data_piece))
+    #         else:
+    #             remain = data
+    #     elif data[0:4] == b'\x30\x31\x63\x64':
+    #         data_length = data[58:62]
+    #         if data_length:
+    #             if big2num(byte2str(data_length)) + 62 > len(data):
+    #                 remain = data
+    #             else:
+    #                 data_piece = data[:62 + big2num(byte2str(data_length))]
+    #                 media_name = data_piece[4:54].split(b'\x00')[0].decode('utf-8')
+    #                 offset = big2num(byte2str(data_piece[54:58]))
+    #                 name_offset_data.get(media_name)[offset] = data_piece
+    #                 text = byte2str(data)[:200]
+    #                 text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
+    #                 logger.debug('%s%s%s%s%s' % ("RECV DATA:   ", 'lens: ',
+    #                                              str(len(data_piece)).ljust(5, ' '), '   data: || ', text_hex))
+    #                 remain = data[62 + big2num(byte2str(data_length)):]
+    #         else:
+    #             remain = data
+    #     else:
+    #         if len(data) >= 4:
+    #             logger.error('收到错误开头的报文。')
+    #             logger.error(byte2str(data))
+    #         else:
+    #             remain = data
+    #     return remain
+
+
+def produce_for_file(buf, remain, rec_obj):
+    data = remain + buf
+    if data[0:1] == b'\x7e':
+        st_list = [m.start() for m in re.finditer(b"\x7e", data)]
+        if len(st_list) >= 2:
+            data_piece = data[:st_list[1] + 1]
+            data_piece = rec_translate(data_piece)
+            if byte2str(data_piece[-2:-1]) == calc_check_code(byte2str(data_piece[1:-2])):
+                text = byte2str(data_piece)
+                text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
+                log_event.debug(
+                    '%s%s%s%s%s%s' % (
+                    rec_obj.client_address, " RECV DATA:   ", 'lens: ', str(len(data_piece)).ljust(5, ' '),
+                    '   data: || ', text_hex))
+                command = data_piece[1:3]
+                func = parse_type_su_ter_for_file.get(command)
+                if func:
+                    reply = func(data_piece, rec_obj)
+                    data_bak = reply
+                    text_hex = ' '.join(data_bak[i:i + 2] for i in range(0, len(data_bak), 2))
+                    log_event.debug('%s%s%s%s%s%s' % (
+                    rec_obj.client_address, " SEND DATA:   ", 'lens: ', str(int(len(data_bak) / 2)).ljust(5, ' '),
+                    '   data: || ', text_hex))
+                    rec_obj.request.sendall(bytes.fromhex(reply))
+                remain = data[st_list[1]+1:]
             else:
-                remain = data
-        elif data[0:4] == b'\x30\x31\x63\x64':
-            data_length = data[58:62]
-            if data_length:
-                if big2num(byte2str(data_length)) + 62 > len(data):
-                    remain = data
-                else:
-                    data_piece = data[:62 + big2num(byte2str(data_length))]
-                    media_name = data_piece[4:54].split(b'\x00')[0].decode('utf-8')
-                    offset = big2num(byte2str(data_piece[54:58]))
-                    name_offset_data.get(media_name)[offset] = data_piece
-                    text = byte2str(data)[:200]
-                    text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
-                    logger.debug('%s%s%s%s%s' % ("RECV DATA:   ", 'lens: ',
-                                                 str(len(data_piece)).ljust(5, ' '), '   data: || ', text_hex))
-                    remain = data[62 + big2num(byte2str(data_length)):]
-            else:
-                remain = data
+                logger.error('校验码错误。')
+                logger.error(byte2str(data_piece))
         else:
-            if len(data) >= 4:
-                logger.error('收到错误开头的报文。')
-                logger.error(byte2str(data))
-            else:
+            remain = data
+    elif data[0:4] == b'\x30\x31\x63\x64':
+        data_length = data[58:62]
+        if data_length:
+            if big2num(byte2str(data_length)) + 62 > len(data):
                 remain = data
-        return remain
+            else:
+                data_piece = data[:62 + big2num(byte2str(data_length))]
+                media_name = data_piece[4:54].split(b'\x00')[0].decode('utf-8')
+                offset = big2num(byte2str(data_piece[54:58]))
+                # logger.error(media_name)
+                name_offset_data.get(media_name)[offset] = data_piece
+                text = byte2str(data)[:100]
+                text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
+                log_event.debug('%s%s%s%s%s%s' % (rec_obj.client_address, " RECV DATA:   ", 'lens: ',
+                                             str(len(data_piece)).ljust(5, ' '), '   data: || ', text_hex))
+                remain = data[62 + big2num(byte2str(data_length)):]
+        else:
+            remain = data
+    else:
+        if len(data) >= 4:
+            logger.error('收到错误开头的报文。')
+            logger.error(byte2str(data))
+        else:
+            remain = data
+    return remain
 
 
-def send_queue_data():
-    try:
-        data = send_queue.get_nowait()
-    except queue.Empty:
-        data = None
+def send_queue_data(data):
     if data:
         if ' ' in data:
             data = ''.join(data.split(' '))
@@ -171,7 +225,7 @@ def send_queue_data():
         if conf.get_protocol_type() == 1:
             if bytes.fromhex(data_bak)[7:8] == b'\x50':
                 media_id = data[-5:-1]
-                log_event.debug('—————— 正在请求多媒体ID为 {} 的数据 ——————'.format(byte2str(media_id)))
+                logger.debug('—————— 正在请求多媒体ID为 {} 的数据 ——————'.format(byte2str(media_id)))
 
         text_hex = ' '.join(data_bak[i:i + 2] for i in range(0, len(data_bak), 2))
         if len(text_hex) > 3000:

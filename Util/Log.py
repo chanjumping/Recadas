@@ -16,14 +16,14 @@ logger.setLevel(logging.DEBUG)
 log_event.setLevel(logging.DEBUG)
 
 if os.listdir('Logs'):
-    m = max([int(x.split('.')[0][3:]) for x in os.listdir('Logs') if 'event' not in x])
+    m = max([int(x.split('.')[0][3:]) for x in os.listdir('Logs') if 'file' not in x])
 else:
     m = 0
 
 # 创建一个handler，用于写入日志文件
 fh = logging.handlers.RotatingFileHandler(r'Logs/log{}.log'.format(m + 1), maxBytes=104857600, backupCount=50)
 fh.setLevel(logging.DEBUG)
-fh_ev = logging.handlers.RotatingFileHandler(r'Logs/log_event{}.log'.format(m + 1), maxBytes=20480000, backupCount=50)
+fh_ev = logging.handlers.RotatingFileHandler(r'Logs/log_file{}.log'.format(m + 1), maxBytes=104857600, backupCount=50)
 fh_ev.setLevel(logging.DEBUG)
 
 # 再创建一个handler，用于输出到控制台
@@ -42,7 +42,7 @@ ch_ev.setFormatter(formatter)
 # 给logger添加handler
 logger.addHandler(fh)
 logger.addHandler(ch)
-log_event.addHandler(fh)
+# log_event.addHandler(fh)
 log_event.addHandler(ch)
 log_event.addHandler(fh_ev)
 log_event.addHandler(ch_ev)

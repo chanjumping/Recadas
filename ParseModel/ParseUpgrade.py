@@ -251,7 +251,7 @@ def parse_upgrade_result_sf(data):
 
 # 苏标终端
 # 下发升级包
-def send_upgrade_pkg_su_dev(data):
+def send_upgrade_pkg_su_ter(data):
     hard_len = big2num(byte2str(data[57:58]))
     hw = data[58:58 + hard_len].decode('utf-8')
     firm_len = big2num(byte2str(data[58 + hard_len:59 + hard_len]))
@@ -263,6 +263,6 @@ def send_upgrade_pkg_su_dev(data):
     send_queue.put(data)
 
 
-def parse_upgrade_state_su_dev(data):
+def parse_upgrade_state_su_ter(data):
     state = byte2str(data[14:15])
     logger.debug('—————— 升级结果 {} ——————'.format(state))

@@ -21,14 +21,14 @@ class SFFuncWindow():
         self.frame_voice = StringVar()
         self.frame_version = StringVar()
         self.frame_bps = StringVar()
-        #终端信息
+        # 终端信息
         self.frame_sf_para_querypara = Button(self.frame_sf_para,text="查询参数",command=self.query_para,bd=5,width=10)
         self.frame_sf_para_querypara.grid(row=0,column=0,ipadx=20,ipady=5,padx=20,pady=10,sticky=W)
         self.frame_sf_para_setpara = Button(self.frame_sf_para,text="【点击】设置参数",command=self.window_para,bd=5,width=10)
         self.frame_sf_para_setpara.grid(row=0,column=1,ipadx=20,ipady=5,pady=10,padx=20,sticky=W)
         self.frame_sf_attr_queryattr = Button(self.frame_sf_para,text="查询属性",command=self.query_attr,bd=5,width=10)
         self.frame_sf_attr_queryattr.grid(row=1,column=0,ipadx=20,ipady=5,pady=10,padx=20,sticky=W)
-        #构造报文
+        # 构造报文
         self.frame_sf_msg_title = Label(self.frame_sf_msg,text="构造报文：")
         self.frame_sf_msg_title.grid(row=0,column=0,ipadx=20,ipady=5,padx=10,pady=5,sticky=W)
         self.frame_sf_msg_value = Entry(self.frame_sf_msg,textvariable=self.frame_msg,width=18,bd=5)
@@ -37,7 +37,7 @@ class SFFuncWindow():
         self.frame_sf_msg_example.grid(row=1,column=1,ipadx=20,padx=5,sticky=W)
         self.frame_sf_msg_exe = Button(self.frame_sf_msg,text="发    送",command=self.send_msg,bd=5)
         self.frame_sf_msg_exe.grid(row=2,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
-        #语音播报
+        # 语音播报
         self.frame_sf_tts_flag = Label(self.frame_sf_tts,text="TTS标识：")
         self.frame_sf_tts_flag.grid(row=0,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_sf_tts_flagvalue = Entry(self.frame_sf_tts,textvariable=self.frame_flag,width=18,bd=5)
@@ -48,7 +48,7 @@ class SFFuncWindow():
         self.frame_sf_tts_voicevalue.grid(row=1,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
         self.frame_sf_tts_exe = Button(self.frame_sf_tts,text="播    报",command=self.send_tts,bd=5)
         self.frame_sf_tts_exe.grid(row=2,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
-        #升级操作
+        # 升级操作
         self.frame_sf_upgrade_version = Label(self.frame_sf_upgrade,text="目标版本号：")
         self.frame_sf_upgrade_version.grid(row=0,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_sf_upgrade_versionvalue = Entry(self.frame_sf_upgrade,textvariable=self.frame_version,width=18,bd=5)
@@ -58,13 +58,13 @@ class SFFuncWindow():
         self.frame_sf_upgrade_bpsvalue = Entry(self.frame_sf_upgrade,textvariable=self.frame_bps,width=18,bd=5)
         self.frame_sf_upgrade_bpsvalue.grid(row=1,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
         self.frame_sf_upgrade_package = Label(self.frame_sf_upgrade,text="升级包：")
-        self.frame_sf_upgrade_package.grid(row=2,column=0,columnspan=2,ipady=5,pady=8,sticky=W)
+        self.frame_sf_upgrade_package.grid(row=2,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_sf_upgrade_select = Button(self.frame_sf_upgrade,text="选择升级包",command=self.select_package,bd=5)
         self.frame_sf_upgrade_select.grid(row=3,column=0,ipadx=10,ipady=5,padx=10,pady=5,sticky=W)
         self.frame_sf_upgrade_exe = Button(self.frame_sf_upgrade,text="升    级",command=self.start_upgrade,bd=5)
         self.frame_sf_upgrade_exe.grid(row=3,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
 
-    #设置参数窗口
+    # 设置参数窗口
     def window_para(self):
         self.window_setpara = Toplevel(self.mainwindow)
         self.ww = self.window_setpara.winfo_screenwidth()
@@ -113,7 +113,7 @@ class SFFuncWindow():
         self.frame_sf_para_exe = Button(self.window_setpara,text="设    置",command=self.set_para,bd=5)
         self.frame_sf_para_exe.grid(row=7,column=1,ipadx=20,ipady=5,pady=5,padx=20,sticky=W)
 
-    #设置参数
+    # 设置参数
     def set_para(self):
         self.ip = self.frame_ip.get()
         self.port = self.frame_port.get()
@@ -148,9 +148,9 @@ class SFFuncWindow():
             body = other + timestamp + pro_id + service + msg_body
             data = '55' + '41' + calc_lens_sf(body) + body + '55'
             send_queue.put(data)
-        self.window_setpara.destroy()
+        # self.window_setpara.destroy()
 
-    #查询参数
+    # 查询参数
     def query_para(self):
         msg_body = ''
         service = num2big((10 << 6) + (4 << 1), 2) + calc_lens_sf(msg_body)
@@ -161,11 +161,11 @@ class SFFuncWindow():
         data = '55' + '41' + calc_lens_sf(body) + body + '55'
         send_queue.put(data)
 
-    #参数结果弹窗
+    # 参数结果弹窗
     def popup_querypara(para):
         messagebox.showinfo(title="终端参数",message=para)
 
-    #查询属性
+    # 查询属性
     def query_attr(self):
         msg_body = ''
         service = num2big((12 << 6) + (4 << 1), 2) + calc_lens_sf(msg_body)
@@ -176,16 +176,16 @@ class SFFuncWindow():
         data = '55' + '41' + calc_lens_sf(body) + body + '55'
         send_queue.put(data)
 
-    #属性结果弹窗
+    # 属性结果弹窗
     def popup_queryattr(attr):
         messagebox.showinfo(title="终端属性",message=attr)
 
-    #构造报文
+    # 构造报文
     def send_msg(self):
         self.msg = self.frame_msg.get()
         send_queue.put(self.msg)
 
-    #tts语音播报
+    # tts语音播报
     def send_tts(self):
         self.flag = self.frame_flag.get()
         self.tts = self.frame_sf_tts_voicevalue.get()
@@ -206,7 +206,7 @@ class SFFuncWindow():
             data = '55' + '41' + calc_lens_sf(body) + body + '55'
             send_queue.put(data)
 
-    #选择升级文件
+    # 选择升级文件
     def select_package(self):
         self.upgradefile = tkinter.filedialog.askopenfilename()
         self.upgradefilename = os.path.split(self.upgradefile)[-1]
@@ -215,7 +215,7 @@ class SFFuncWindow():
         else:
             self.frame_sf_upgrade_package.configure(text="未选择任何升级包")
 
-    #执行升级
+    # 执行升级
     def start_upgrade(self):
         self.version = self.frame_version.get()
         self.bps = self.frame_bps.get()

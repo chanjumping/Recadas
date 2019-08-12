@@ -26,6 +26,7 @@ log_queue = queue.Queue()
 # 非告警报文队列
 common_queue = queue.Queue()
 
+
 # 缓存收到的告警报文
 data_cache_list = []
 
@@ -234,11 +235,15 @@ media_id_driver_id = {}
 name_size = {}
 # 记录文件名称和多媒体偏移量和数据片段长度的关系{name:{offset:length}}
 name_offset_data = {}
+# 记录发送的9208数据，用于判断是否收到通用应答{流水号：报文}
+send_address_dict = {}
+# 记录发送的9208数据的超时时间
+send_address_time_out = 10
 
 # # 初始流水号
 serial_no = 0
 
-# 控制串行获取告警数据标志位
+# 控制苏标外设串行获取告警数据标志位
 fetch_media_flag = True
 
 

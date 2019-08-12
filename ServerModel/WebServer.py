@@ -82,7 +82,7 @@ class WebServer(BaseHTTPRequestHandler):
 
 def run_http_server():
     addr = conf.get_address()
-    port = 2080
+    port = 8080
 
     server_address = (addr, port)
     logger.debug('Starting HTTP Server ... IP {} Port {}'.format(addr, port))

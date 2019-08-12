@@ -52,7 +52,7 @@ def parse_location_upload_jt808(data):
         alarm_type = alarm_type_code_jt808.get(big2num(byte2str(data[57:58])))
         # driver_id = data[59:63]
         # mediaid_driverid[media_id] = driver_id
-        log_event.debug('—————— 图片告警ID {} 视频告警ID {} 告警类型 ---------- {} ——————'.format(img_media_id, vid_media_id, alarm_type))
+        logger.debug('—————— 图片告警ID {} 视频告警ID {} 告警类型 ---------- {} ——————'.format(img_media_id, vid_media_id, alarm_type))
     reply_data = comm_reply_jt808(data, '00')
     send_queue.put(reply_data)
 

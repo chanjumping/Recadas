@@ -25,26 +25,26 @@ class MainWindow():
         # 创建菜单栏
         # self.createBar()
 
-        ttk.Style().configure(".", font=("STxingkai", 28), foreground="black")
+        ttk.Style().configure(".", font=('Fixdsys', 20), foreground="black")
 
         # 苏标外设框架
         self.su = Frame(self.tabPage)
-        self.tabPage.add(self.su, text="苏标外设")
+        self.tabPage.add(self.su, text="  苏标外设  ")
         self.su_device()
 
-        self.rw = Frame(self.tabPage)
-        self.tabPage.add(self.rw, text="私有协议")
+        # self.rw = Frame(self.tabPage)
+        # self.tabPage.add(self.rw, text="瑞为协议")
 
         self.jt808 = Frame(self.tabPage)
-        self.tabPage.add(self.jt808, text="JT808协议")
+        self.tabPage.add(self.jt808, text="  JT808协议  ")
         self.jt_808()
 
         self.sf = Frame(self.tabPage)
-        self.tabPage.add(self.sf, text="顺丰协议")
+        self.tabPage.add(self.sf, text="  顺丰协议  ")
         self.shunfeng()
 
         self.dev = Frame(self.tabPage)
-        self.tabPage.add(self.dev, text="苏标终端")
+        self.tabPage.add(self.dev, text="  苏标终端  ")
         self.su_terminal()
 
         self.mainwindow.mainloop()
@@ -105,7 +105,7 @@ class MainWindow():
         self.frame_dev_tts.grid(row=2, column=0, sticky=W)
         self.frame_dev_file = LabelFrame(self.dev, text="远程查询", font=("STxingkai", 20))
         self.frame_dev_file.grid(row=2, column=1, sticky=W)
-        self.frame_su_ter_para = LabelFrame(self.dev, text="参数操作", font=("STxingkai", 20))
+        self.frame_su_ter_para = LabelFrame(self.dev, text="玖合远程获取附件", font=("STxingkai", 20))
         self.frame_su_ter_para.grid(row=3, column=0, sticky=W)
 
         frame_list = [self.frame_dev_upgrade, self.frame_dev_msg, self.frame_dev_info, self.frame_dev_para,
