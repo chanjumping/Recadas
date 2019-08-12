@@ -6,7 +6,6 @@ from Util.GlobalVar import send_queue
 from Util import GlobalVar
 import time
 from Util.Log import logger
-import queue
 
 
 class DogThread(threading.Thread):

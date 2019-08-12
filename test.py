@@ -23,9 +23,3 @@
 #         # # with open("7.11.txt", 'a') as f:
 #         # #     f.write("{},{}".format(x['bdLatitude'], x['bdLongitude']))
 #         # #     f.write('\n')
-
-
-def test(a,b, **c):
-    print(a,b,c)
-
-test(1,2)

@@ -171,7 +171,7 @@ def produce_for_file(buf, remain, rec_obj):
                     log_event.debug('%s%s%s%s%s%s' % (
                     rec_obj.client_address, " SEND DATA:   ", 'lens: ', str(int(len(data_bak) / 2)).ljust(5, ' '),
                     '   data: || ', text_hex))
-                    rec_obj.request.sendall(bytes.fromhex(reply))
+                    rec_obj.request.sendall(send_translate(bytes.fromhex(reply)))
                 remain = data[st_list[1]+1:]
             else:
                 logger.error('校验码错误。')

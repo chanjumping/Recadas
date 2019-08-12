@@ -101,9 +101,9 @@ class TCPRequestHandlerForFile(socketserver.BaseRequestHandler):
         logger.debug('【 File Server 】 Connected by {} {} ...'.format(address, port))
         TCPRequestHandler.isAlive = True
         logger.debug('【 File Server 】 Producer Thread Start ...')
-        send_thread = SendData('【 File Server 】 Send Thread Start ...', self)
-        send_thread.setDaemon(True)
-        send_thread.start()
+        # send_thread = SendData('【 File Server 】 Send Thread Start ...', self)
+        # send_thread.setDaemon(True)
+        # send_thread.start()
 
         while True:
             try:

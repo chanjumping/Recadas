@@ -183,7 +183,7 @@ def send_server_command_su_ter(alarm_flag):
 def parse_alarm_attachment_msg_su_ter(data, rec_obj):
     terminal_id = byte2str(data[13:20])
     alarm_flag = byte2str(data[20:36])
-    alarm_num = byte2str(data[36:68])
+    alarm_num = data[36:68].decode('utf-8')
     msg_type = byte2str(data[68:69])
     attachment_num = big2num(byte2str(data[69:70]))
     log_event.debug('{} —————— 报警附件信息 ——————'.format(rec_obj.client_address))
