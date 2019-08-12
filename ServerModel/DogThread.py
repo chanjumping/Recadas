@@ -21,7 +21,7 @@ class DogThread(threading.Thread):
         while self.rec_obj.isAlive:
             if GlobalVar.send_address_time_out == 0:
                 send_address_data_list = GlobalVar.send_address_dict.values()
-                for data in send_address_data_list:
+                for data in list(send_address_data_list)[:3]:
                     logger.debug('—————— 重传服务器地址 ——————')
                     send_queue.put(data)
                 GlobalVar.send_address_time_out = 10
