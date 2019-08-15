@@ -98,8 +98,8 @@ class SuTerFuncWindow():
             Radiobutton(self.frame_dev_info, text=girl, variable=self.frame_devid, value=num).grid(row=1, column=num,
                                                                                 ipadx=7, ipady=5, pady=6, sticky=W)
 
-        self.frame_dev_info_query = Button(self.frame_dev_info,text="查    询",command=self.query_info,bd=5)
-        self.frame_dev_info_query.grid(row=2, column=1,columnspan=4, ipadx=20, ipady=5, pady=5,padx=50, sticky=W)
+        self.frame_dev_info_query = Button(self.frame_dev_info, text="查    询", command=self.query_info,bd=5)
+        self.frame_dev_info_query.grid(row=2, column=1, columnspan=4, ipadx=20, ipady=5, pady=5, padx=10, sticky=W)
 
         #参数操作
         self.frame_dev_para_case = Label(self.frame_dev_para, text="用例：")
@@ -112,6 +112,8 @@ class SuTerFuncWindow():
         self.frame_dev_para_query = Button(self.frame_dev_para, text="查询所有参数", command=self.query_allpara, bd=5,
                                          width=15)
         self.frame_dev_para_query.grid(row=2, column=0, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_jt_attr_queryattr = Button(self.frame_dev_para,text="查询终端属性",command=self.query_attr,bd=5,width=15)
+        self.frame_jt_attr_queryattr.grid(row=2,column=1,ipadx=20,ipady=5,pady=5,padx=5,sticky=W)
 
         #tts语音
         self.frame_dev_tts_flag = Label(self.frame_dev_tts,text="TTS标记：",width=10)
@@ -186,8 +188,15 @@ class SuTerFuncWindow():
 
     #查询参数
     def query_allpara(self):
-        body = "8106" + "0015" + GlobalVar.DEVICEID + self.serial_num + "050000001300000018000000550000008300000084"
+        body = "8106" + "0015" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "050000001300000018000000550000008300000084"
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
+        send_queue.put(data)
+
+    # 查询属性
+    def query_attr(self):
+        logger.debug('—————— 查询终端属性 ——————')
+        body = '8107' + '0000' + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no())
+        data = '7E' + body + calc_check_code(body) + '7E'
         send_queue.put(data)
 
     def popup_para(attr):

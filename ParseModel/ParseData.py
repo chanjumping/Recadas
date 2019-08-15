@@ -228,8 +228,8 @@ def send_queue_data(data):
                 logger.debug('—————— 正在请求多媒体ID为 {} 的数据 ——————'.format(byte2str(media_id)))
 
         text_hex = ' '.join(data_bak[i:i + 2] for i in range(0, len(data_bak), 2))
-        if len(text_hex) > 3000:
-            text_hex = text_hex[:3000]
+        if len(text_hex) > 200:
+            text_hex = text_hex[:200]
         if conf.get_protocol_type() == 1:
             if not data_bak[14:16] == '31':
                 logger.debug('%s%s%s%s%s' % ("SEND DATA:   ", 'lens: ', str(int(len(data_bak)/2)).ljust(5, ' '), '   data: || ', text_hex))

@@ -26,6 +26,8 @@ class Consumer(threading.Thread):
                     data_rec = data
                     text = byte2str(data)
                     text_hex = ' '.join(text[i:i + 2] for i in range(0, len(text), 2))
+                    if len(text_hex) > 200:
+                        text_hex = text_hex[:200]
                     logger.debug(
                         '%s%s%s%s%s' % ("RECV DATA:   ", 'lens: ', str(len(data_rec)).ljust(5, ' '), '   data: || ', text_hex))
 

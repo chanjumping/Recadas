@@ -3,6 +3,7 @@
 
 from Util.CommonMethod import *
 from Util.GlobalVar import *
+import os
 
 
 class SaveLogThread(threading.Thread):
@@ -16,6 +17,9 @@ class SaveLogThread(threading.Thread):
 
     def run(self):
         logger.debug(threading.current_thread().getName())
+        path_dir = os.path.join('Result', 'DeviceLog')
+        if not os.path.exists(path_dir):
+            os.mkdir(path_dir)
         buf = b''
         while True:
             while not log_queue.empty():
@@ -26,9 +30,10 @@ class SaveLogThread(threading.Thread):
                 buf += log_data
                 if total_num - 1 == pkg_no:
                     t = time.strftime(r'%Y%m%d%H%M%S', time.localtime())
-                    log_name = 'log_{}.zip'.format(t)
+                    log_name = 'log_{}.tar.gz'.format(t)
+                    log_name = os.path.join(path_dir, log_name)
                     with open(log_name, 'ab') as f:
                         f.write(buf)
                     self.buf = b''
                 time.sleep(0.001)
-            time.sleep(0.1)
+            time.sleep(3)

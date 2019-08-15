@@ -22,7 +22,7 @@ class SyncThread(threading.Thread):
     def run(self):
         if conf.get_protocol_type() == 1:
             logger.debug(threading.current_thread().getName())
-            conf_path = os.path.join(os.getcwd(), '实时同步数据.xls')
+            conf_path = os.path.join('TestData', '苏标外设实时同步数据.xls')
             while self.rec_obj.isAlive:
                 table = GetTestData(conf_path)
                 table.open()

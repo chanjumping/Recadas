@@ -99,7 +99,7 @@ class MainWindow():
         self.frame_dev_msg.grid(row=0, column=1, sticky=W)
         self.frame_dev_info = LabelFrame(self.dev, text="基本信息", font=("STxingkai", 20))
         self.frame_dev_info.grid(row=1, column=0, sticky=W)
-        self.frame_dev_para = LabelFrame(self.dev, text="设置参数", font=("STxingkai", 20))
+        self.frame_dev_para = LabelFrame(self.dev, text="参数操作", font=("STxingkai", 20))
         self.frame_dev_para.grid(row=1, column=1, sticky=W)
         self.frame_dev_tts = LabelFrame(self.dev, text="语音播报", font=("STxingkai", 20))
         self.frame_dev_tts.grid(row=2, column=0, sticky=W)

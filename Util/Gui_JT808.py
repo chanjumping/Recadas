@@ -24,11 +24,11 @@ class JTFuncWindow():
         self.frame_voice = StringVar()
         self.frame_photo = StringVar()
         # 终端信息
-        self.frame_jt_para_querypara = Button(self.frame_jt_para,text="查询参数",command=self.query_para,bd=5,width=10)
+        self.frame_jt_para_querypara = Button(self.frame_jt_para,text="查询终端参数",command=self.query_para,bd=5,width=10)
         self.frame_jt_para_querypara.grid(row=0,column=0,ipadx=20,ipady=5,padx=20,pady=10,sticky=W)
         self.frame_jt_para_setpara = Button(self.frame_jt_para,text="【点击】设置参数",command=self.window_para,bd=5,width=10)
         self.frame_jt_para_setpara.grid(row=0,column=1,ipadx=20,ipady=5,pady=10,padx=20,sticky=W)
-        self.frame_jt_attr_queryattr = Button(self.frame_jt_para,text="查询属性",command=self.query_attr,bd=5,width=10)
+        self.frame_jt_attr_queryattr = Button(self.frame_jt_para,text="查询终端属性",command=self.query_attr,bd=5,width=10)
         self.frame_jt_attr_queryattr.grid(row=1,column=0,ipadx=20,ipady=5,pady=10,padx=20,sticky=W)
         # 构造报文
         self.frame_jt_msg_title = Label(self.frame_jt_msg,text="构造报文：")

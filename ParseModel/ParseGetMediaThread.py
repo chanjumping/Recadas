@@ -32,7 +32,7 @@ class GetMediaThread(threading.Thread):
         logger.debug(threading.current_thread().getName())
         while True:
             try:
-                data, command, rec_obj = rec_alarm_queue.get_nowait()
+                data, command = rec_alarm_queue.get_nowait()
             except queue.Empty:
                 data = None
             if data:
@@ -81,7 +81,7 @@ class GetMediaThread(threading.Thread):
                 logger.debug('—————— 视频ID {} 告警类型 -------------------- {} ——————'.format(
                     byte2str(video_id), alarm_type_code_su_adas.get(alarm_type)))
             logger.debug('—————— 速度 {} 高程 {} 纬度 {} 经度 {} 告警时间 {} 车辆状态 {} ——————'.format(
-                big2num(byte2str(speed)),big2num(byte2str(height)), byte2str(latitude), byte2str(longitude),
+                big2num(byte2str(speed)), big2num(byte2str(height)), big2num(byte2str(latitude)), big2num(byte2str(longitude)),
                 byte2str(alarm_time), byte2str(state)))
             if conf.get_get_media_flag():
                 for x in range(num):
@@ -171,12 +171,12 @@ class GetMediaThread(threading.Thread):
                     channel = '其他'
                 # alarm_flag = byte2str(data[25:29])
                 state = byte2str(data[29:33])
-                latitude = byte2str(data[33:37])
-                longitude = byte2str(data[37:41])
+                latitude = big2num(byte2str(data[33:37]))
+                longitude = big2num(byte2str(data[37:41]))
                 speed = big2num(byte2str(data[43:45]))
                 alarm_time = byte2str(data[47:53])
-                logger.debug('—————— 通道 {}，状态 {}，速度 {} km/h, 纬度 {}，经度 {}, 时间 {} ——————'.format(channel, state, speed/10, latitude,
-                                                                                    longitude, alarm_time))
+                logger.debug('—————— 通道 {} 状态 {} 速度 {} km/h 纬度 {} 经度 {} 时间 {} ——————'.format(channel, state, speed,
+                                                                                               latitude, longitude, alarm_time))
                 # 如果当前告警ID不在已接收完成的多媒体列表（media_finish）中，则将该ID添加到进去，并且将值置为False
                 # 记录最后一个分片包对应的流水号和告警ID的键值对，存入last_pkg_media_id
                 # 计算出该ID对应的分片包范围，并且添加到记录告警ID和多媒体数据的列表中（media_id_data）
