@@ -104,12 +104,12 @@ class SuFuncWindow():
         self.frame_su_mode_exe.grid(row=2,column=1,columnspan=3,ipadx=20,ipady=5,pady=5,padx=15,sticky=W)
 
         # 升级功能
-        self.frame_su_upgrade_bps = Label(self.frame_su_upgrade,text="波特率：",width=10)
+        self.frame_su_upgrade_bps = Label(self.frame_su_upgrade,text="分片包大小：",width=10)
         self.frame_su_upgrade_bps.grid(row=0,column=0,ipadx=20,ipady=5,pady=5,sticky=W)
         self.frame_su_upgrade_bpsdata = Entry(self.frame_su_upgrade,textvariable=self.frame_upgrade_bps,bd=5,width=18)
         self.frame_su_upgrade_bpsdata.grid(row=0,column=1,ipadx=20,ipady=5,pady=5,padx=20,sticky=W)
         self.frame_su_upgrade_direct = Label(self.frame_su_upgrade,text="升级包：")
-        self.frame_su_upgrade_direct.grid(row=1,column=0,columnspan=2,sticky=W)
+        self.frame_su_upgrade_direct.grid(row=1,column=0,columnspan=2,ipadx=20,ipady=5,pady=5,sticky=W)
         self.frame_su_upgrade_select = Button(self.frame_su_upgrade,text="选择升级包",command=self.select_upgrade_file,bd=5)
         self.frame_su_upgrade_select.grid(row=2,column=0,ipadx=10,ipady=5,pady=5,padx=5,sticky=W)
         self.frame_su_upgrade_exe = Button(self.frame_su_upgrade,text="升   级",command=self.start_upgrade,bd=5)

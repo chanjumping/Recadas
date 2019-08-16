@@ -97,7 +97,7 @@ class SuFuncWindow():
         self.frame_su_mode_exe = Button(self.frame_su_mode,text="模式切换",command=self.model_change,bd=5)
         self.frame_su_mode_exe.grid(row=2,column=1,columnspan=3,ipadx=20,ipady=5,pady=5,padx=15,sticky=W)
         #升级功能
-        self.frame_su_upgrade_bps = Label(self.frame_su_upgrade,text="波特率：",width=10)
+        self.frame_su_upgrade_bps = Label(self.frame_su_upgrade,text="分片包大小：",width=10)
         self.frame_su_upgrade_bps.grid(row=0,column=0,ipadx=20,ipady=5,pady=5,sticky=W)
         self.frame_su_upgrade_bpsdata = Entry(self.frame_su_upgrade,textvariable=self.frame_upgrade_bps,bd=5,width=18)
         self.frame_su_upgrade_bpsdata.grid(row=0,column=1,ipadx=20,ipady=5,pady=5,padx=20,sticky=W)

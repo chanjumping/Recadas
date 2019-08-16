@@ -53,7 +53,7 @@ class SFFuncWindow():
         self.frame_sf_upgrade_version.grid(row=0,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_sf_upgrade_versionvalue = Entry(self.frame_sf_upgrade,textvariable=self.frame_version,width=18,bd=5)
         self.frame_sf_upgrade_versionvalue.grid(row=0,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)
-        self.frame_sf_upgrade_bps = Label(self.frame_sf_upgrade,text="波特率：")
+        self.frame_sf_upgrade_bps = Label(self.frame_sf_upgrade,text="分片包大小：")
         self.frame_sf_upgrade_bps.grid(row=1,column=0,ipadx=20,ipady=5,padx=5,pady=5,sticky=W)
         self.frame_sf_upgrade_bpsvalue = Entry(self.frame_sf_upgrade,textvariable=self.frame_bps,width=18,bd=5)
         self.frame_sf_upgrade_bpsvalue.grid(row=1,column=1,ipadx=20,ipady=5,padx=20,pady=5,sticky=W)

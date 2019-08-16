@@ -34,6 +34,6 @@ class SaveLogThread(threading.Thread):
                     log_name = os.path.join(path_dir, log_name)
                     with open(log_name, 'ab') as f:
                         f.write(buf)
-                    self.buf = b''
+                    buf = b''
                 time.sleep(0.001)
             time.sleep(3)
