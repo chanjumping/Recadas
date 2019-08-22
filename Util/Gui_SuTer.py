@@ -193,7 +193,8 @@ class SuTerFuncWindow():
 
     #查询参数
     def query_allpara(self):
-        body = "8106" + "0015" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "050000001300000018000000550000008300000084"
+        # body = "8106" + "0015" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "010000F364"
+        body = "8106" + "001D" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "0700000013000000180000005500000083000000840000F3650000F364"
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
 

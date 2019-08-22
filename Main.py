@@ -5,7 +5,6 @@ import os
 from Util.Log import logger
 from ServerModel.TCPRequestHandler import TCPRequestHandler, TCPRequestHandlerForFile, ThreadedTCPServer, TCPRequestHandlerForVideo
 import threading
-# from Util.Gui import loop
 from Util.ReadConfig import conf
 from SaveModel.SaveMediaThread import SaveMediaThread
 from ParseModel.Consumer import ParseComm, Consumer
@@ -70,7 +69,6 @@ def main():
     get_media_thread.start()
 
     MainWindow()
-    # loop()
     try:
         while True:
             wake_event.wait()
