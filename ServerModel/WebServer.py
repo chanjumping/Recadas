@@ -81,11 +81,11 @@ class WebServer(BaseHTTPRequestHandler):
 
 
 def run_http_server():
-    addr = conf.get_address()
-    port = 8080
+    addr = conf.get_file_address_sf_local()
+    port = conf.get_file_port_sf_local()
 
     server_address = (addr, port)
-    logger.debug('Starting HTTP Server ... IP {} Port {}'.format(addr, port))
+    logger.debug('【 File Server 】 Starting HTTP Server ... Local IP {} Port {}'.format(addr, port))
 
     httpd = HTTPServer(server_address, WebServer)
     httpd.serve_forever()

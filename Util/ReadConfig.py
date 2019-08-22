@@ -21,10 +21,15 @@ class ReadConfig:
         self.get_media_flag = True
         self.address = '192.168.100.100'
         self.port = 8888
-        self.file_address = '103.46.128.43'
-        self.file_port = 28388
-        self.file_address_local = '103.46.128.43'
-        self.file_port_local = 28388
+        self.file_address_su_ter = '103.46.128.43'
+        self.file_port_su_ter = 28388
+        self.file_address_su_ter_local = '192.168.100.100'
+        self.file_port_su_ter_local = 8000
+        self.file_address_sf_local = '192.168.100.100'
+        self.file_port_sf_local = 9999
+        self.instant_video = True
+        self.instant_video_address_local = '192.168.100.100'
+        self.instant_video_port_local = 9999
 
     def get_config(self):
         content = open(conf_path, encoding='utf-8').read()
@@ -40,10 +45,15 @@ class ReadConfig:
         self.set_get_media_flag(config.getboolean('config', 'get_media'))
         self.set_address(config.get('config', 'address'))
         self.set_port(config.getint('config', 'port'))
-        self.set_file_address(config.get('config', 'file_address'))
-        self.set_file_port(config.getint('config', 'file_port'))
-        self.set_file_address_local(config.get('config', 'file_address_local'))
-        self.set_file_port_local(config.getint('config', 'file_port_local'))
+        self.set_file_address_su_ter(config.get('config', 'file_address_su_ter'))
+        self.set_file_port_su_ter(config.getint('config', 'file_port_su_ter'))
+        self.set_file_address_su_ter_local(config.get('config', 'file_address_su_ter_local'))
+        self.set_file_port_su_ter_local(config.getint('config', 'file_port_su_ter_local'))
+        self.set_file_address_sf_local(config.get('config', 'file_address_sf_local'))
+        self.set_file_port_sf_local(config.getint('config', 'file_port_sf_local'))
+        self.set_instant_video_flag(config.getboolean('config', 'instant_video'))
+        self.set_instant_video_address_local(config.get('config', 'instant_video_address_local'))
+        self.set_instant_video_port_local(config.getint('config', 'instant_video_port_local'))
 
     def set_sync_flag(self, value):
         self.sync_flag = value
@@ -75,29 +85,59 @@ class ReadConfig:
     def get_port(self):
         return self.port
 
-    def set_file_address(self, value):
-        self.file_address = value
+    def set_file_address_su_ter(self, value):
+        self.file_address_su_ter = value
 
-    def get_file_address(self):
-        return self.file_address
+    def get_file_address_su_ter(self):
+        return self.file_address_su_ter
 
-    def set_file_port(self, value):
-        self.file_port = value
+    def set_file_port_su_ter(self, value):
+        self.file_port_su_ter = value
 
-    def get_file_port(self):
-        return self.file_port
+    def get_file_port_su_ter(self):
+        return self.file_port_su_ter
 
-    def set_file_address_local(self, value):
-        self.file_address_local = value
+    def set_file_address_su_ter_local(self, value):
+        self.file_address_su_ter_local = value
 
-    def get_file_address_local(self):
-        return self.file_address_local
+    def get_file_address_su_ter_local(self):
+        return self.file_address_su_ter_local
 
-    def set_file_port_local(self, value):
-        self.file_port_local = value
+    def set_file_port_su_ter_local(self, value):
+        self.file_port_su_ter_local = value
 
-    def get_file_port_local(self):
-        return self.file_port_local
+    def get_file_port_su_ter_local(self):
+        return self.file_port_su_ter_local
+
+    def set_file_address_sf_local(self, value):
+        self.file_address_sf_local = value
+
+    def get_file_address_sf_local(self):
+        return self.file_address_sf_local
+
+    def set_file_port_sf_local(self, value):
+        self.file_port_sf_local = value
+
+    def get_file_port_sf_local(self):
+        return self.file_port_sf_local
+
+    def set_instant_video_flag(self, value):
+        self.instant_video = value
+
+    def get_instant_video_flag(self):
+        return self.instant_video
+
+    def set_instant_video_address_local(self, value):
+        self.instant_video_address_local = value
+
+    def get_instant_video_address_local(self):
+        return self.instant_video_address_local
+
+    def set_instant_video_port_local(self, value):
+        self.instant_video_port_local = value
+
+    def get_instant_video_port_local(self):
+        return self.instant_video_port_local
 
 
 conf = ReadConfig()

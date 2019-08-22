@@ -131,6 +131,11 @@ class SuTerFuncWindow():
         self.frame_dev_takephoto.grid(row=0,column=0,ipadx=20, ipady=5,padx=5, pady=20, sticky=W)
         self.frame_dev_para_window = Button(self.frame_dev_photo,text="【设置参数窗口】",command=self.window_para,bd=5,width=15)
         self.frame_dev_para_window.grid(row=0, column=1, ipadx=20, ipady=5, padx=5, pady=20, sticky=W)
+        # self.frame_dev_takephoto = Button(self.frame_dev_photo,text="开启实时视频",command=self.start_instant_video,width=18,bd=5)
+        # self.frame_dev_takephoto.grid(row=1,column=0,ipadx=20, ipady=5,padx=5, pady=20, sticky=W)
+        # self.frame_dev_para_window = Button(self.frame_dev_photo,text="关闭实时视频",command=self.stop_instant_video,bd=5,width=15)
+        # self.frame_dev_para_window.grid(row=1, column=1, ipadx=20, ipady=5, padx=5, pady=20, sticky=W)
+
 
         #远程查询告警附件
         self.frame_dev_remote = Button(self.frame_dev_file,text="【远程查询窗口】",command=self.window_remote,width=18,bd=5)
@@ -458,5 +463,11 @@ class SuTerFuncWindow():
         self.frame_dev_para_colorexample.grid(row=5, column=1, ipadx=1, ipady=1, padx=5, sticky=W)
         self.frame_dev_para_set = Button(self.window_setpara,text="设    置",command=self.set_para,width=10,bd=5)
         self.frame_dev_para_set.grid(row=6, column=1, ipadx=10, ipady=5, padx=5, pady=5, sticky=W)
+
+    def start_instant_video(self):
+        pass
+
+    def stop_instant_video(self):
+        pass
 
 

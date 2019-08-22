@@ -6,6 +6,8 @@ from Util.ReadConfig import conf
 from Util.Log import log_event
 from ParseModel.Consumer import parse_type_su_ter_for_file
 
+isIzhen = False
+
 
 def produce(buf, remain):
     if conf.get_protocol_type() == 1:
@@ -202,6 +204,55 @@ def produce_for_file(buf, remain, rec_obj):
             logger.error(byte2str(data))
         else:
             remain = data
+    return remain
+
+
+def produce_for_video(buf, remain, rec_obj):
+    global isIzhen
+    data = remain + buf
+    if len(data) > 30:
+        if data[0:4] == b'\x30\x31\x63\x64':
+            data_content_len = big2num(byte2str(data[28:30]))
+            if len(data[30:]) > data_content_len:
+                channel = big2num(byte2str(data[14:15]))
+                frame_type = (big2num(byte2str(data[15:16])) & 0b11110000) >> 4
+                # if frame_type == 0:
+                #     log_event.debug('I帧')
+                # elif frame_type == 1:
+                #     log_event.debug('P帧')
+                # elif frame_type == 2:
+                #     log_event.debug('B帧')
+                #
+                # divide = big2num(byte2str(data[15:16])) & 0b00001111
+                # if divide == 0:
+                #     log_event.debug('原子包')
+                # elif divide == 1:
+                #     log_event.debug('第一个包')
+                # elif divide == 2:
+                #     log_event.debug('最后一个包')
+                # elif divide == 3:
+                #     log_event.debug('中间包')
+                if frame_type == 0:
+                    isIzhen = True
+                if isIzhen:
+                    data_content = data[30:30+data_content_len]
+                    if channel == 1:
+                        with open('DSM.h264', 'ab') as f:
+                            f.write(data_content)
+                    elif channel == 2:
+                        with open('ADAS.h264', 'ab') as f:
+                            f.write(data_content)
+                    elif channel == 3:
+                        with open('ThirdCamera.h264', 'ab') as f:
+                            f.write(data_content)
+                    elif channel == 4:
+                        with open('ForthCamera.h264', 'ab') as f:
+                            f.write(data_content)
+                remain = data[30+data_content_len:]
+            else:
+                remain = data
+    else:
+        remain = data
     return remain
 
 

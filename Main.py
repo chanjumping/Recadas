@@ -3,7 +3,7 @@
 
 import os
 from Util.Log import logger
-from ServerModel.TCPRequestHandler import TCPRequestHandler, TCPRequestHandlerForFile, ThreadedTCPServer
+from ServerModel.TCPRequestHandler import TCPRequestHandler, TCPRequestHandlerForFile, ThreadedTCPServer, TCPRequestHandlerForVideo
 import threading
 # from Util.Gui import loop
 from Util.ReadConfig import conf
@@ -30,18 +30,26 @@ def main():
     server_thread.start()
     logger.debug('【 Data Server 】 Server starting, waiting for connection ...')
     if conf.get_protocol_type() == 5:
-        FILE_HOST = conf.get_file_address_local()
-        FILE_PORT = conf.get_file_port_local()
+        FILE_HOST = conf.get_file_address_su_ter_local()
+        FILE_PORT = conf.get_file_port_su_ter_local()
         file_server = ThreadedTCPServer((FILE_HOST, FILE_PORT), TCPRequestHandlerForFile)
         file_server_thread = threading.Thread(target=file_server.serve_forever)
         file_server_thread.daemon = True
         file_server_thread.start()
         logger.debug('【 File Server 】 Server starting, waiting for connection ...')
+    if conf.get_instant_video_flag():
+        VIDEO_HOST = conf.get_instant_video_address_local()
+        VIDEO_PORT = conf.get_instant_video_port_local()
+        file_server = ThreadedTCPServer((VIDEO_HOST, VIDEO_PORT), TCPRequestHandlerForVideo)
+        file_server_thread = threading.Thread(target=file_server.serve_forever)
+        file_server_thread.daemon = True
+        file_server_thread.start()
+        logger.debug('【 Video Server 】 Server starting, waiting for connection ...')
     if conf.get_protocol_type() == 1:
         while not query_msg_queue.empty():
             query_msg_queue.get(block=False)
         from SaveModel.SaveLogThread import SaveLogThread
-        save_log_thread = SaveLogThread('SaveLog Thread Start ...')
+        save_log_thread = SaveLogThread('【 Data Server 】 SaveLog Thread Start ...')
         save_log_thread.setDaemon(True)
         save_log_thread.start()
     elif conf.get_protocol_type() == 4:

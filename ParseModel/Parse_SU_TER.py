@@ -160,8 +160,8 @@ def parse_register_su_ter(data):
 # 苏标终端下发服务器命令
 def send_server_command_su_ter(alarm_flag):
     logger.debug('—————— 下发服务器地址 ——————')
-    server = conf.get_file_address()
-    port = conf.get_file_port()
+    server = conf.get_file_address_su_ter()
+    port = conf.get_file_port_su_ter()
     control = '00'
     if control == 'AA':
         upload = '05'
