@@ -18,7 +18,6 @@ class SuTerFuncWindow():
         self.frame_dev_photo = photo
         self.frame_dev_file = file
         self.mainwindow = mainwindow
-        self.serial_num = "0000"
         self.agreement_sign = "7E"
         self.dev_FuncWindow()
 
@@ -32,6 +31,8 @@ class SuTerFuncWindow():
         self.frame_speed = StringVar()
         self.frame_carnumber = StringVar()
         self.frame_carcolor = StringVar()
+        self.frame_overspeed_time = StringVar()
+        self.frame_overspeed_chazhi = StringVar()
         self.frame_tts = StringVar()
         # self.frame_type = StringVar()
         self.frame_num = StringVar()
@@ -187,14 +188,16 @@ class SuTerFuncWindow():
         elif self.id == 3:
             self.id = '67'
         msg_body = self.trans + "01" + self.id
-        body = "8900" + num2big(int(len(msg_body) / 2)) + GlobalVar.DEVICEID + self.serial_num + msg_body
+        body = "8900" + num2big(int(len(msg_body) / 2)) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no(), 2) + msg_body
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
 
-    #查询参数
+    # 查询参数
     def query_allpara(self):
+        logger.debug('—————— 查询终端参数 ——————')
         # body = "8106" + "0015" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "010000F364"
-        body = "8106" + "001D" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "0700000013000000180000005500000083000000840000F3650000F364"
+        msg_body = "09000000130000001800000055000000560000005B00000083000000840000F3650000F364"
+        body = "8106" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + msg_body
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
 
@@ -206,39 +209,50 @@ class SuTerFuncWindow():
         send_queue.put(data)
 
     def popup_para(attr):
-        messagebox.showinfo(title="终端参数",message=attr)
+        messagebox.showinfo(title="终端参数", message=attr)
 
     def set_para(self):
-        self.ip = self.frame_ip.get()
-        self.port = self.frame_port.get()
-        self.limitspeed = self.frame_speed.get()
-        self.carnumber = self.frame_carnumber.get()
-        self.carcolor = self.frame_carcolor.get()
+        ip = self.frame_ip.get()
+        port = self.frame_port.get()
+        limitspeed = self.frame_speed.get()
+        carnumber = self.frame_carnumber.get()
+        carcolor = self.frame_carcolor.get()
+        overspeed_time = self.frame_overspeed_time.get()
+        overspeed_chazhi = self.frame_overspeed_chazhi.get()
+
         num = 0
         msg_body = ""
         txt = ""
-        if self.ip:
+        if ip:
             num += 1
-            ip_len = len(self.ip)
-            msg_body += '00000013' + num2big(ip_len, 1) + str2hex(self.ip, ip_len)
-            txt += '服务器 {} '.format(self.ip)
-        if self.port:
+            ip_len = len(ip)
+            msg_body += '00000013' + num2big(ip_len, 1) + str2hex(ip, ip_len)
+            txt += '服务器 {} '.format(ip)
+        if port:
             num += 1
-            msg_body += '00000018' + '04' + num2big(int(self.port), 4)
-            txt += '端口号 {} '.format(self.port)
-        if self.limitspeed:
+            msg_body += '00000018' + '04' + num2big(int(port), 4)
+            txt += '端口号 {} '.format(port)
+        if limitspeed:
             num += 1
-            msg_body += '00000055' + '04' + num2big(int(self.limitspeed), 4)
-            txt += '最高速度 {} '.format(self.limitspeed)
-        if self.carnumber:
+            msg_body += '00000055' + '04' + num2big(int(limitspeed), 4)
+            txt += '最高速度 {} '.format(limitspeed)
+        if carnumber:
             num += 1
-            num_len = len(byte2str(self.carnumber.encode("gbk")))/2
-            msg_body += '00000083' + num2big(int(num_len),1) + byte2str(self.carnumber.encode("gbk"))
-            txt += '车牌号码 {} '.format(self.carnumber)
-        if self.carcolor:
+            num_len = len(byte2str(carnumber.encode("gbk")))/2
+            msg_body += '00000083' + num2big(int(num_len),1) + byte2str(carnumber.encode("gbk"))
+            txt += '车牌号码 {} '.format(carnumber)
+        if carcolor:
             num += 1
-            msg_body += '00000084' + "01" + num2big(int(self.carcolor),1)
-            txt += '车辆颜色 {} '.format(self.carcolor)
+            msg_body += '00000084' + "01" + num2big(int(carcolor),1)
+            txt += '车辆颜色 {} '.format(carcolor)
+        if overspeed_time:
+            num += 1
+            msg_body += '00000056' + "01" + num2big(int(overspeed_time),4)
+            txt += '超速持续时间 {} '.format(overspeed_time)
+        if overspeed_chazhi:
+            num += 1
+            msg_body += '0000005B' + "01" + num2big(int(overspeed_chazhi),2)
+            txt += '超速预警差值 {} '.format(overspeed_chazhi)
         if num:
             msg_body = num2big(num, 1) + msg_body
             body = '8103' + num2big(int(len(msg_body) / 2), 2) + GlobalVar.DEVICEID + \
@@ -249,11 +263,11 @@ class SuTerFuncWindow():
             send_queue.put(data)
         # self.window_setpara.destroy()
 
-    #查询指定参数
+    # 查询指定参数
     def query_appointpara(self):
         pass
 
-    #选择测试用例
+    # 选择测试用例
     def select_case_file(self):
         self.casefile = tkinter.filedialog.askopenfilename()
         self.casefilename = os.path.split(self.casefile)[-1]
@@ -262,7 +276,7 @@ class SuTerFuncWindow():
         else:
             self.frame_dev_para_case.config(text="未选择任何用例")
 
-    #执行测试用例
+    # 执行测试用例
     def case_exe(self):
         case = GetTestData(self.casefile)
         case.open()
@@ -299,13 +313,13 @@ class SuTerFuncWindow():
                 tts_flag = '08'
             msg_body = tts_flag + byte2str(self.tts.encode('gbk'))
             body = '8300' + num2big(int(len(msg_body) / 2)) + GlobalVar.DEVICEID + \
-                   self.serial_num + msg_body
+                   num2big(GlobalVar.get_serial_no(), 2) + msg_body
             data = '7E' + body + calc_check_code(body) + '7E'
             send_queue.put(data)
         else:
             messagebox.showerror(title="Parameter Error",message="Please input voice")
 
-    #立即拍照
+    # 立即拍照
     def take_photo(self):
         self.passid = self.frame_channel.get()
         if self.passid == 1:
@@ -332,7 +346,7 @@ class SuTerFuncWindow():
             para_num += 2
             msg_body += "0001"
         msg_body += "00000000000000"
-        body = "8801" + num2big(para_num) + GlobalVar.DEVICEID + self.serial_num + msg_body
+        body = "8801" + num2big(para_num) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no(), 2) + msg_body
         data = self.agreement_sign + body +  calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
         # else:
@@ -340,7 +354,7 @@ class SuTerFuncWindow():
         # self.window_takephoto.destroy()
 
 
-    #远程查看告警附件
+    # 远程查看告警附件
     def query_file(self):
         self.ip = self.frame_ip.get()
         self.port = self.frame_port.get()
@@ -349,7 +363,7 @@ class SuTerFuncWindow():
         if self.ip and self.port and self.flag:
             msg_body = num2big(len(self.ip),1) + str2hex(self.ip,len(self.ip)) + num2big(int(self.port))\
                        + "0000" + self.flag + num2big(len(self.name),1) + str2hex(self.name,len(self.name))
-            body = "9211" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + self.serial_num + msg_body
+            body = "9211" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no(), 2) + msg_body
             data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
             send_queue.put(data)
         else:
@@ -436,8 +450,8 @@ class SuTerFuncWindow():
         self.ww = self.window_setpara.winfo_screenwidth()
         self.wh = self.window_setpara.winfo_screenheight()
         self.mw = (self.ww - 400) / 2
-        self.mh = (self.wh - 350) / 2
-        self.window_setpara.geometry("%dx%d+%d+%d" % (400, 350, self.mw, self.mh))
+        self.mh = (self.wh - 400) / 2
+        self.window_setpara.geometry("%dx%d+%d+%d" % (400, 450, self.mw, self.mh))
         self.window_setpara.title("参数设置窗口")
 
         self.frame_dev_para_ip = Label(self.window_setpara,text="IP地址：",width=10)
@@ -460,10 +474,21 @@ class SuTerFuncWindow():
         self.frame_dev_para_color.grid(row=4, column=0, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
         self.frame_dev_para_colorvalue = Entry(self.window_setpara,textvariable=self.frame_carcolor,bd=5,width=15)
         self.frame_dev_para_colorvalue.grid(row=4, column=1, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+
+        self.frame_dev_para_color = Label(self.window_setpara,text="超速持续时间：",width=10)
+        self.frame_dev_para_color.grid(row=5, column=0, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_dev_para_colorvalue = Entry(self.window_setpara,textvariable=self.frame_overspeed_time,bd=5,width=15)
+        self.frame_dev_para_colorvalue.grid(row=5, column=1, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+
+        self.frame_dev_para_color = Label(self.window_setpara,text="超速预警差值：",width=10)
+        self.frame_dev_para_color.grid(row=6, column=0, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_dev_para_colorvalue = Entry(self.window_setpara,textvariable=self.frame_overspeed_chazhi,bd=5,width=15)
+        self.frame_dev_para_colorvalue.grid(row=6, column=1, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+
         self.frame_dev_para_colorexample = Label(self.window_setpara,text="{1:蓝色，2:黄色，3:黑色，4:白色，9:其他}",fg="red")
-        self.frame_dev_para_colorexample.grid(row=5, column=1, ipadx=1, ipady=1, padx=5, sticky=W)
+        self.frame_dev_para_colorexample.grid(row=7, column=1, ipadx=1, ipady=1, padx=5, sticky=W)
         self.frame_dev_para_set = Button(self.window_setpara,text="设    置",command=self.set_para,width=10,bd=5)
-        self.frame_dev_para_set.grid(row=6, column=1, ipadx=10, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_dev_para_set.grid(row=8, column=1, ipadx=10, ipady=5, padx=5, pady=5, sticky=W)
 
     def start_instant_video(self):
         pass

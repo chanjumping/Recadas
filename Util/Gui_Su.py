@@ -22,7 +22,6 @@ class SuFuncWindow():
         self.su_func_window()
         self.adas_sign = "64"
         self.dsm_sign = "65"
-        self.serial_num = "0000"
         self.msn = "033D"
         self.agreement_sign = "7E"
         
@@ -129,84 +128,84 @@ class SuFuncWindow():
 
     #ADAS查询
     def adas_query(self):
-        data = self.serial_num + self.msn + self.adas_sign + "2F"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "2F"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code+ data + self.agreement_sign
         send_queue.put(message)
 
     #DSM查询
     def dsm_query(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "2F"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "2F"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #恢复ADAS默认参数
     def adas__default_para(self):
-        data = self.serial_num + self.msn + self.adas_sign + "30"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "30"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #恢复DSM默认参数
     def dsm_default_para(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "30"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "30"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #读取ADAS基本信息
     def adas_infor(self):
-        data = self.serial_num + self.msn + self.adas_sign + "32"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "32"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #读取DSM基本信息
     def dsm_infor(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "32"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "32"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #查询ADAS参数
     def adas_para_query(self):
-        data = self.serial_num + self.msn + self.adas_sign + "34"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "34"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #查询DSM参数
     def dsm_para_query(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "34"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "34"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #查询ADAS工作状态
     def adas_work_stat(self):
-        data = self.serial_num + self.msn + self.adas_sign + "37"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "37"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #查询DSM工作状态
     def dsm_work_stat(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "37"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "37"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #ADAS抓拍
     def adas_take_photo(self):
-        data = self.serial_num + self.msn + self.adas_sign + "52"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.adas_sign + "52"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
 
     #DSM抓拍
     def dsm_take_photo(self):
-        data = self.serial_num + self.msn + self.dsm_sign + "52"
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "52"
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)
@@ -266,7 +265,7 @@ class SuFuncWindow():
             self.standsign = '01'
         elif self.standsign == 3:
             self.standsign = 'FF'
-        data = self.serial_num + self.msn + self.dsm_sign + "EF" + self.workesign + self.standsign
+        data = num2big(GlobalVar.get_serial_no(), 2) + self.msn + self.dsm_sign + "EF" + self.workesign + self.standsign
         check_code = calc_check_code(data)
         message = self.agreement_sign + check_code + data + self.agreement_sign
         send_queue.put(message)

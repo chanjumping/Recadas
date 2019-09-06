@@ -237,16 +237,16 @@ def produce_for_video(buf, remain, rec_obj):
                 if isIzhen:
                     data_content = data[30:30+data_content_len]
                     if channel == 1:
-                        with open('DSM.h264', 'ab') as f:
+                        with open(r'Result/H264/DSM.h264', 'ab') as f:
                             f.write(data_content)
                     elif channel == 2:
-                        with open('ADAS.h264', 'ab') as f:
+                        with open(r'Result/H264/ADAS.h264', 'ab') as f:
                             f.write(data_content)
                     elif channel == 3:
-                        with open('ThirdCamera.h264', 'ab') as f:
+                        with open(r'Result/H264/ThirdCamera.h264', 'ab') as f:
                             f.write(data_content)
                     elif channel == 4:
-                        with open('ForthCamera.h264', 'ab') as f:
+                        with open(r'Result/H264/FourthCamera.h264', 'ab') as f:
                             f.write(data_content)
                 remain = data[30+data_content_len:]
             else:
