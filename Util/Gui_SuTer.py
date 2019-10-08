@@ -247,11 +247,11 @@ class SuTerFuncWindow():
             txt += '车辆颜色 {} '.format(carcolor)
         if overspeed_time:
             num += 1
-            msg_body += '00000056' + "01" + num2big(int(overspeed_time),4)
+            msg_body += '00000056' + "04" + num2big(int(overspeed_time),4)
             txt += '超速持续时间 {} '.format(overspeed_time)
         if overspeed_chazhi:
             num += 1
-            msg_body += '0000005B' + "01" + num2big(int(overspeed_chazhi),2)
+            msg_body += '0000005B' + "02" + num2big(int(overspeed_chazhi),2)
             txt += '超速预警差值 {} '.format(overspeed_chazhi)
         if num:
             msg_body = num2big(num, 1) + msg_body

@@ -128,6 +128,8 @@ alarm_type_code_su_ter_dsm = {
     b'\x06': 'WheelHand',
     b'\x07': 'CameraBlock',
     b'\x16': '开机抓拍',
+    b'\xfe': '行车安全提示',
+    b'\xff': '安全教育'
 
 }
 

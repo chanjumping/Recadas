@@ -36,14 +36,14 @@ def main():
         file_server_thread.daemon = True
         file_server_thread.start()
         logger.debug('【 File Server 】 Server starting, waiting for connection ...')
-    if conf.get_instant_video_flag():
-        VIDEO_HOST = conf.get_instant_video_address_local()
-        VIDEO_PORT = conf.get_instant_video_port_local()
-        file_server = ThreadedTCPServer((VIDEO_HOST, VIDEO_PORT), TCPRequestHandlerForVideo)
-        file_server_thread = threading.Thread(target=file_server.serve_forever)
-        file_server_thread.daemon = True
-        file_server_thread.start()
-        logger.debug('【 Video Server 】 Server starting, waiting for connection ...')
+        if conf.get_instant_video_flag():
+            VIDEO_HOST = conf.get_instant_video_address_local()
+            VIDEO_PORT = conf.get_instant_video_port_local()
+            file_server = ThreadedTCPServer((VIDEO_HOST, VIDEO_PORT), TCPRequestHandlerForVideo)
+            file_server_thread = threading.Thread(target=file_server.serve_forever)
+            file_server_thread.daemon = True
+            file_server_thread.start()
+            logger.debug('【 Video Server 】 Server starting, waiting for connection ...')
     if conf.get_protocol_type() == 1:
         while not query_msg_queue.empty():
             query_msg_queue.get(block=False)
