@@ -20,10 +20,11 @@ class WebServer(BaseHTTPRequestHandler):
     def do_POST(self):
         device_id = self.headers['device']
         alarm_time = self.headers['time']
+        form_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(alarm_time)/1000))
         authorization = self.headers['Authorization']
         logger.debug('———————————————— 上传附件信息 ————————————————')
         logger.debug('设备ID {}'.format(device_id))
-        logger.debug('告警时间 {}'.format(alarm_time))
+        logger.debug('告警时间 {}'.format(form_time))
         logger.debug('认证码 {}'.format(authorization))
         if authorization == get_md5(device_id + get_md5('1CwO4BTUlSi3GuTw') + alarm_time):
             logger.debug('———————————————— 认证码正确 ————————————————')

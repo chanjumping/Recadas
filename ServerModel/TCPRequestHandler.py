@@ -24,6 +24,7 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
         # self.request.settimeout(self.timeOut)
 
     def handle(self):
+        time.sleep(0.5)
         address, port = self.client_address
         logger.debug('【 Data Server 】 Connected by {} {} ...'.format(address, port))
         TCPRequestHandler.isAlive = True

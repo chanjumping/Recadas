@@ -10,6 +10,7 @@ import datetime
 from functools import reduce
 from Util.ReadConfig import conf
 import time
+import struct
 
 
 # 十六进制小端模式转整型
@@ -252,3 +253,18 @@ def calc_lens_sf(data):
     else:
         logger.error('长度范围超出。')
     return length
+
+
+# 浮点型与十六进制转换
+def float2hex(num, isbig):
+    if not isbig:
+        return struct.pack('<f', num).hex()
+    else:
+        return struct.pack('>f', num).hex()
+
+
+def hex2float(num, isbig):
+    if not isbig:
+        return struct.unpack('<f', bytes.fromhex(num))[0]
+    else:
+        return struct.unpack('>f', bytes.fromhex(num))[0]

@@ -4,6 +4,7 @@
 from Util.CommonMethod import *
 from Util.GlobalVar import *
 import gc
+from ParseModel.Parse_SF import common_reply_sf
 
 filename = 'Package.zip'
 mode = 0
@@ -247,6 +248,7 @@ def parse_upgrade_result_sf(data):
     logger.debug('升级状态 {}'.format(up_info))
     logger.debug('软件版本 {}'.format(version))
     logger.debug('—————— END ——————')
+    common_reply_sf(data, '01')
 
 
 # 苏标终端
