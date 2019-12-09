@@ -94,6 +94,7 @@ alarm_type_code_su_dsm = {
     b'\x1F': 'Infra_Part',
     b'\x06': 'WheelHand',
     b'\x07': 'CameraBlock',
+    b'\x20': 'OverSpeed',
 
 }
 
@@ -203,6 +204,7 @@ alarm_type_code_jt808 = {
 para_id_jt808_su_ter = {
     '00000013': '服务器IP',
     '00000018': '端口号',
+    '00000029': '缺省时间汇报间隔',
     '00000055': '最高速度',
     '00000083': '车牌号',
     '00000084': '车辆颜色',

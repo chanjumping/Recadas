@@ -13,7 +13,8 @@ comm_type = {
     b'\x92\x11': '新增0x9211',
     b'\x81\x06': '查询参数',
     b'\x8F\x01': '重启设备',
-    b'\x8F\xA0': '平台主动升级'
+    b'\x8F\xA0': '平台主动升级',
+    b'\x81\x05': '终端控制'
 }
 
 
@@ -390,7 +391,7 @@ def parse_query_para_su_ter(data):
         if para_id == '00000013' or para_id == '00000083':
             para_content = para_content.decode('gbk')
             logger.debug('参数ID {}  {}:{}'.format(para_id, GlobalVar.para_id_jt808_su_ter.get(para_id), para_content))
-        elif para_id == '00000018' or para_id == '00000055' or para_id == '00000056' or para_id == '0000005B' or para_id == '00000084':
+        elif para_id == '00000018' or para_id == '00000029' or para_id == '00000055' or para_id == '00000056' or para_id == '0000005B' or para_id == '00000084':
             para_content = big2num(byte2str(para_content))
             logger.debug('参数ID {}  {}:{}'.format(para_id, GlobalVar.para_id_jt808_su_ter.get(para_id), para_content))
         elif para_id == '0000F365':
@@ -409,7 +410,7 @@ def parse_query_para_su_ter(data):
             smoke_duration = big2num(byte2str(para_content[19:21]))
             phone_duration = big2num(byte2str(para_content[21:23]))
             retain1 = byte2str(para_content[23:26])
-            fatigue_level_speed = byte2str(para_content[26:27])
+            fatigue_level_speed = big2num(byte2str(para_content[26:27]))
             fatigue_video_duration = big2num(byte2str(para_content[27:28]))
             fatigue_photo_count = big2num(byte2str(para_content[28:29]))
             fatigue_photo_time = big2num(byte2str(para_content[29:30]))
@@ -573,7 +574,7 @@ def parse_query_para_su_ter(data):
 def parse_upgrade_result_su_ter(data):
     upgrade_type = byte2str(data[13:14])
     upgrade_result = byte2str(data[14:15])
-    logger.debug('—————— 终端升级结果: 升级类型 {} 升级结果 ——————'.format(upgrade_type, upgrade_result))
+    logger.debug('—————— 终端升级结果: 升级类型 {} 升级结果 {}——————'.format(upgrade_type, upgrade_result))
 
 
 def parse_take_picture_su_ter(data):

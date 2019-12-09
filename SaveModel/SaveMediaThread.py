@@ -34,6 +34,8 @@ class SaveMediaThread(threading.Thread):
                         else:
                             event_type = alarm_type_code_su_adas.get(media_alarm_code.get(media_id))
                             dir_name = os.path.join('Result', 'ADAS_media')
+                        t = time.strftime(r'%Y%m%d%H', time.localtime())
+                        dir_name = os.path.join(dir_name, t)
                         if not os.path.exists(dir_name):
                             os.makedirs(dir_name)
                         media_type = byte2str(data[8:9])

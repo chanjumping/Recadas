@@ -33,6 +33,7 @@ class SuTerFuncWindow():
         self.frame_carcolor = StringVar()
         self.frame_overspeed_time = StringVar()
         self.frame_overspeed_chazhi = StringVar()
+        self.frame_default_time = StringVar()
         self.frame_tts = StringVar()
         # self.frame_type = StringVar()
         self.frame_num = StringVar()
@@ -167,7 +168,7 @@ class SuTerFuncWindow():
     #     self.id = self.frame_devid.get()
     #     if self.trans and self.id:
     #         msg_body = self.trans + "01" + self.id
-    #         body = "8900" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + self.serial_num + msg_body
+    #         body = "8900" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no(), 2) + msg_body
     #         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
     #         send_queue.put(data)
     #     else:
@@ -196,7 +197,7 @@ class SuTerFuncWindow():
     def query_allpara(self):
         logger.debug('—————— 查询终端参数 ——————')
         # body = "8106" + "0015" + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + "010000F364"
-        msg_body = "09000000130000001800000055000000560000005B00000083000000840000F3650000F364"
+        msg_body = "0B0000000100000013000000180000002900000055000000560000005B00000083000000840000F3650000F364"
         body = "8106" + num2big(int(len(msg_body)/2)) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + msg_body
         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
         send_queue.put(data)
@@ -219,6 +220,7 @@ class SuTerFuncWindow():
         carcolor = self.frame_carcolor.get()
         overspeed_time = self.frame_overspeed_time.get()
         overspeed_chazhi = self.frame_overspeed_chazhi.get()
+        default_time = self.frame_default_time.get()
 
         num = 0
         msg_body = ""
@@ -232,6 +234,10 @@ class SuTerFuncWindow():
             num += 1
             msg_body += '00000018' + '04' + num2big(int(port), 4)
             txt += '端口号 {} '.format(port)
+        if default_time:
+            num += 1
+            msg_body += '00000029' + '04' + num2big(int(default_time), 4)
+            txt += '缺省时间汇报间隔 {} '.format(default_time)
         if limitspeed:
             num += 1
             msg_body += '00000055' + '04' + num2big(int(limitspeed), 4)
@@ -298,7 +304,7 @@ class SuTerFuncWindow():
     #         msg_body += "00000018" + "04" + num2big(int(self.port),4)
     #     if number:
     #         msg_body = num2big(number,1) + msg_body
-    #         body = "8103" + num2big(int(len(msg_body)/2),2) + GlobalVar.DEVICEID + self.serial_num + msg_body
+    #         body = "8103" + num2big(int(len(msg_body)/2),2) + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no(), 2) + msg_body
     #         data = self.agreement_sign + body + calc_check_code(body) + self.agreement_sign
     #         send_queue.put(data)
 
@@ -450,8 +456,8 @@ class SuTerFuncWindow():
         self.ww = self.window_setpara.winfo_screenwidth()
         self.wh = self.window_setpara.winfo_screenheight()
         self.mw = (self.ww - 400) / 2
-        self.mh = (self.wh - 400) / 2
-        self.window_setpara.geometry("%dx%d+%d+%d" % (400, 450, self.mw, self.mh))
+        self.mh = (self.wh - 500) / 2
+        self.window_setpara.geometry("%dx%d+%d+%d" % (400, 500, self.mw, self.mh))
         self.window_setpara.title("参数设置窗口")
 
         self.frame_dev_para_ip = Label(self.window_setpara,text="IP地址：",width=10)
@@ -485,10 +491,17 @@ class SuTerFuncWindow():
         self.frame_dev_para_colorvalue = Entry(self.window_setpara,textvariable=self.frame_overspeed_chazhi,bd=5,width=15)
         self.frame_dev_para_colorvalue.grid(row=6, column=1, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
 
+        self.frame_dev_para_color = Label(self.window_setpara,text="缺省时间汇报间隔：",width=10)
+        self.frame_dev_para_color.grid(row=7, column=0, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_dev_para_colorvalue = Entry(self.window_setpara, textvariable=self.frame_default_time, bd=5, width=15)
+        self.frame_dev_para_colorvalue.grid(row=7, column=1, ipadx=20, ipady=5, padx=5, pady=5, sticky=W)
+
         self.frame_dev_para_colorexample = Label(self.window_setpara,text="{1:蓝色，2:黄色，3:黑色，4:白色，9:其他}",fg="red")
-        self.frame_dev_para_colorexample.grid(row=7, column=1, ipadx=1, ipady=1, padx=5, sticky=W)
+        self.frame_dev_para_colorexample.grid(row=8, column=1, ipadx=1, ipady=1, padx=5, sticky=W)
+
+
         self.frame_dev_para_set = Button(self.window_setpara,text="设    置",command=self.set_para,width=10,bd=5)
-        self.frame_dev_para_set.grid(row=8, column=1, ipadx=10, ipady=5, padx=5, pady=5, sticky=W)
+        self.frame_dev_para_set.grid(row=10, column=1, ipadx=10, ipady=5, padx=5, pady=5, sticky=W)
 
     def start_instant_video(self):
         pass

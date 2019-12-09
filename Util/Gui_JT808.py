@@ -291,9 +291,9 @@ class JTFuncWindow():
     def take_photo(self):
         self.photo = self.photo_channel.get()
         if self.photo == 1:
-            self.photo = '01'
+            self.photo = '00'
         elif self.photo == 2:
-            self.photo ='02'
+            self.photo ='01'
         if self.photo:
             msg_body = num2big(int(self.photo), 1) + '00' * 11
             body = '8801' + '000C' + GlobalVar.DEVICEID + num2big(GlobalVar.get_serial_no()) + msg_body

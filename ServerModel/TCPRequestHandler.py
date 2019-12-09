@@ -18,10 +18,10 @@ class TCPRequestHandler(socketserver.BaseRequestHandler):
         if conf.get_protocol_type() == 1:
             self.timeOut = None
         else:
-            self.timeOut = 25
+            self.timeOut = 20
         self.remain = b''
         self.isAlive = True
-        # self.request.settimeout(self.timeOut)
+        self.request.settimeout(self.timeOut)
 
     def handle(self):
         time.sleep(0.5)
